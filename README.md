@@ -9,6 +9,11 @@ Hermana de [Hiedra](https://github.com/Gonvegato/hiedra) (juegos), [Marfil](http
 y aquí aparecen solos, con su estado, sus horas y sus portadas, para valorarlos. Las películas, las series y tus categorías propias siguen
 aquí tal cual (con su «Añadir»).
 
+## 1.1.4
+
+- Al oír el sello de una hermana solo se baja lo de esa (antes, lo de las tres, con los capítulos de Cobalto enteros, cada vez). Y si dos
+  hermanas sellan a la vez, no se pierde ninguna.
+
 ## 1.1.3
 
 - «Leer en Marfil» (en la portada y en cada obra de Escritos) abre Marfil **leyendo esa obra** (Marfil 0.12.3 o más nueva).

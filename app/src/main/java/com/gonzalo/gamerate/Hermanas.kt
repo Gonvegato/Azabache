@@ -38,13 +38,25 @@ object Hermanas {
         private set
     private val mirado = java.util.concurrent.ConcurrentHashMap<String, Long>()
     private val pidiendo = java.util.concurrent.atomic.AtomicBoolean(false)
+    /** Lo que hay pendiente de mirar: nombres de hermanas, o «*» = todas. */
+    private val pendientes = java.util.Collections.synchronizedSet(HashSet<String>())
     private val scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.IO)
 
-    /** Mira lo de las hermanas dentro de poco (varias peticiones seguidas se juntan en una). */
-    fun pronto(c: Context, ya: Boolean = false) {
+    /**
+     * Mira lo de las hermanas dentro de poco (varias peticiones seguidas se juntan en una). Con [solo], solo lo de esa hermana (es lo que
+     * se pide al oír su sello: no se vuelve a bajar lo de las otras).
+     */
+    fun pronto(c: Context, ya: Boolean = false, solo: String? = null) {
+        pendientes += solo ?: "*"
         if (!pidiendo.compareAndSet(false, true)) return
         val app = c.applicationContext
-        scope.launch { try { kotlinx.coroutines.delay(400); runCatching { refrescar(app, Store(app), ya) } } finally { pidiendo.set(false) } }
+        scope.launch {
+            try {
+                kotlinx.coroutines.delay(400)
+                val que: Set<String>; synchronized(pendientes) { que = HashSet(pendientes); pendientes.clear() }
+                runCatching { refrescar(app, Store(app), ya, if ("*" in que) null else que) }
+            } finally { pidiendo.set(false); if (pendientes.isNotEmpty()) pronto(app, ya) }
+        }
     }
     private fun prefs(c: Context) = c.getSharedPreferences("hermanas", Context.MODE_PRIVATE)
     private fun enPantalla(f: () -> Unit) { if (Looper.myLooper() == Looper.getMainLooper()) f() else Handler(Looper.getMainLooper()).post(f) }
@@ -412,16 +424,17 @@ object Hermanas {
      * Mira lo que han subido las hermanas y lo refleja (como mucho cada 5 minutos, o ya con [ya]). Bloqueante (red). Devuelve si ha cambiado algo.
      * Los errores de red se tragan: se vuelve a intentar la próxima vez.
      */
-    fun refrescar(c: Context, store: Store, ya: Boolean = false): Boolean {
+    fun refrescar(c: Context, store: Store, ya: Boolean = false, solo: Set<String>? = null): Boolean {
         if (!store.paired) return false
         val ahora = System.currentTimeMillis()
         if (!ya && ahora - (mirado["x"] ?: 0L) < 5 * 60_000L) return false
-        mirado["x"] = ahora
+        if (solo == null) mirado["x"] = ahora
+        fun toca(app: String) = solo == null || app in solo
         var cambio = false
         val uid = store.accUid
         fun nodo(path: String): JSONObject? = runCatching { Account.db(store, "GET", "/users/$uid/$path", null)?.let { JSONObject(it) } }.getOrNull()
         // Hiedra
-        runCatching {
+        if (toca("hiedra")) runCatching {
             val b = blobs(store, "hiedra")
             if (b.isNotEmpty()) {
                 val juegos = juegosDe(b)
@@ -433,7 +446,7 @@ object Hermanas {
             }
         }
         // Marfil
-        runCatching {
+        if (toca("marfil")) runCatching {
             val b = blobs(store, "marfil")
             if (b.isNotEmpty()) {
                 val libros = librosDe(b)
@@ -445,8 +458,10 @@ object Hermanas {
             }
         }
         // Cobalto
-        runCatching { nodo("cobalto/palabras")?.let { guarda(c, "palabras_cobalto", it.toString()); cambio = true } }
-        runCatching { nodo("cobalto/lectura")?.let { guarda(c, "lectura_cobalto", it.toString()); cambio = true } }
+        if (toca("cobalto")) {
+            runCatching { nodo("cobalto/palabras")?.let { guarda(c, "palabras_cobalto", it.toString()); cambio = true } }
+            runCatching { nodo("cobalto/lectura")?.let { guarda(c, "lectura_cobalto", it.toString()); cambio = true } }
+        }
         prefs(c).edit().putLong("ultima", ahora).apply()
         if (cambio) enPantalla { version++ }
         return cambio

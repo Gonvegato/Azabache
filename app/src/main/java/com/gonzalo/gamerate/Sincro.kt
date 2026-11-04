@@ -200,9 +200,9 @@ object Sincro {
             if (path.trim('/') != yo) bajaPronto()
         })
         // Las hermanas: en cuanto Hiedra, Marfil o Cobalto suben algo, se refleja aquí
-        for (app in listOf("hiedra", "marfil", "cobalto")) escuchas += FbStream("hermana-$app", { f -> url(st, "/users/$uid/$app/stamps", f) }, { _, _ -> Hermanas.pronto(c, ya = true) })
+        for (app in listOf("hiedra", "marfil", "cobalto")) escuchas += FbStream("hermana-$app", { f -> url(st, "/users/$uid/$app/stamps", f) }, { _, _ -> Hermanas.pronto(c, ya = true, solo = app) })
         // Marfil sella lo leído de cada libro aparte («lstamps»): así el Diario tiene los minutos de hoy en cuanto cierras el libro
-        escuchas += FbStream("hermana-marfil-lec", { f -> url(st, "/users/$uid/marfil/lstamps", f) }, { _, _ -> Hermanas.pronto(c, ya = true) })
+        escuchas += FbStream("hermana-marfil-lec", { f -> url(st, "/users/$uid/marfil/lstamps", f) }, { _, _ -> Hermanas.pronto(c, ya = true, solo = "marfil") })
         // Tu pareja: lo que valora, lee o escribe aparece al momento (si te deja verlo)
         // (si aún no te deja verlo, Firebase dice «sin permiso»: no es cosa de tu sesión, así que no se renueva por eso)
         if (pareja.isNotBlank()) escuchas += FbStream("pareja", { _ -> url(st, "/users/$pareja/stamps", false) }, { _, _ -> parejaPronto() })
