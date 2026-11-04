@@ -9,6 +9,11 @@ Hermana de [Hiedra](https://github.com/Gonvegato/hiedra) (juegos), [Marfil](http
 y aquí aparecen solos, con su estado, sus horas y sus portadas, para valorarlos. Las películas, las series y tus categorías propias siguen
 aquí tal cual (con su «Añadir»).
 
+## 1.1.1
+
+- Azabache escucha también `marfil/lstamps` (el sello de lo leído de cada libro): los minutos de hoy salen en el Diario en cuanto cierras el libro
+  en Marfil, sin esperar a que Marfil suba su biblioteca.
+
 ## 1.1.0: las mismas portadas que en Hiedra y Marfil, y los Escritos en Marfil
 
 - **Portadas**: un juego o un libro enseña aquí la misma portada que tiene en Hiedra o en Marfil. Las de internet viajan con la ficha (`pu`;

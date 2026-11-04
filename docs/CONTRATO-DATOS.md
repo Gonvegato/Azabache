@@ -20,7 +20,7 @@ refleja en sus propias listas, donde se valoran. Los contratos de cada una está
 | Cobalto | `palabras/<dispositivo>` | Las palabras escritas cada día (se suman los dispositivos): el Diario. |
 | Cobalto | `lectura/<obra>/<capítulo>` | Los capítulos terminados, para «Escritos» (con Marfil en el móvil, se leen allí: Azabache abre Marfil con el extra `go=escritos`). |
 
-Se mira al abrir la app, al vincular la cuenta, al entrar en el Diario y en cuanto una hermana sube algo (se escucha `stamps` de las tres).
+Se mira al abrir la app, al vincular la cuenta, al entrar en el Diario y en cuanto una hermana sube algo (se escucha `stamps` de las tres y `lstamps` de Marfil). Cada hermana escribe sus nodos ligeros **antes** de sellar.
 
 ## Cómo se enlaza
 
