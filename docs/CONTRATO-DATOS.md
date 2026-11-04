@@ -13,12 +13,12 @@ refleja en sus propias listas, donde se valoran. Los contratos de cada una está
 |---|---|---|
 | Hiedra | `stamps`, `dev/<dispositivo>/data` | La biblioteca de juegos: se mezclan los dispositivos por `id` (gana el `mod` más reciente; las horas `msp` se suman por dispositivo y las `ex` por máximo). Cada juego pasa a una ficha de Azabache: `PASADO` → valorado; `JUGANDO`/`PENDIENTE`/`ABANDONADO` → en curso (estados 1/0/2). |
 | Hiedra | `tiempo/<id>/<fuente>` | Lo jugado cada día (las fuentes se suman), para el Diario y el calendario. |
-| Hiedra | `nube/portadas/<id>` | La portada que pusiste tú (se baja de kDrive si Azabache tiene tu token). |
+| Hiedra | `nube/portadas/<id>` | La portada que pusiste tú de la galería (se baja de kDrive si Azabache tiene tu token). Si no hay, la dirección que viaja en la biblioteca: `pu` (la que elegiste de internet) o `pa` (la caja automática de libretro, Hiedra 0.3.0). |
 | Marfil | `stamps`, `dev/<dispositivo>/data` | La biblioteca de libros: por clave `k`; `LEIDO` → valorado (con la última fecha de `tm`), `LEYENDO`/`PENDIENTE` → en curso. |
 | Marfil | `tiempo/<kid>/<escritor>` | Lo leído cada día: por dispositivo y día el máximo entre escritores, y luego se suman los dispositivos. |
-| Marfil | `portadas/<kid>` | Tu portada en kDrive (`f`, `u`; `x` = quitada). |
+| Marfil | `portadas/<kid>` | Tu portada en kDrive (`f`, `u`; `x` = quitada). Si no hay (o no hay token), `pu` de la biblioteca: la dirección de la que elegiste de internet (Marfil 0.12.0). |
 | Cobalto | `palabras/<dispositivo>` | Las palabras escritas cada día (se suman los dispositivos): el Diario. |
-| Cobalto | `lectura/<obra>/<capítulo>` | Los capítulos terminados, para leerlos en «Escritos». |
+| Cobalto | `lectura/<obra>/<capítulo>` | Los capítulos terminados, para «Escritos» (con Marfil en el móvil, se leen allí: Azabache abre Marfil con el extra `go=escritos`). |
 
 Se mira al abrir la app, al vincular la cuenta, al entrar en el Diario y en cuanto una hermana sube algo (se escucha `stamps` de las tres).
 

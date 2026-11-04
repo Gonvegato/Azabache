@@ -52,10 +52,13 @@ object Hermanas {
     /** ¿Está instalada esa hermana en este móvil? */
     fun instalada(c: Context, paquete: String) = runCatching { c.packageManager.getLaunchIntentForPackage(paquete) != null }.getOrDefault(false)
     /** Abre esa hermana (si está). */
-    fun abrir(c: Context, paquete: String): Boolean {
+    fun abrir(c: Context, paquete: String, destino: String = ""): Boolean {
         val i = c.packageManager.getLaunchIntentForPackage(paquete) ?: return false
+        if (destino.isNotBlank()) i.putExtra("go", destino)
         c.startActivity(i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); return true
     }
+    /** Abre Marfil en sus «Escritos» (Marfil 0.12.0 o más nueva), donde los capítulos de Cobalto se leen con su lector. */
+    fun leerEnMarfil(c: Context) = abrir(c, PAQ_MARFIL, "escritos")
 
     // ================================================================ lo que sube cada una (sin red: se puede probar)
 
@@ -94,7 +97,7 @@ object Hermanas {
             val clavesLanz = lanz.mapNotNull { x -> when (x.optString("tp")) {
                 "ROM" -> "rom:${x.optString("s")}:${normName(x.optString("a"))}"; "APP" -> "app:${x.optString("pk")}"; "PC" -> "pc:${x.optString("pck")}"
                 "WEB" -> "web:" + x.optString("u").lowercase().removePrefix("https://").removePrefix("http://").removePrefix("www.").trimEnd('/'); else -> null } }
-            JuegoH(id, g.optString("t"), g.optString("pl"), g.optString("es").ifBlank { "PENDIENTE" }, g.optBoolean("f"), g.optLong("fi"), g.optLong("an"), g.optLong("ul"), g.optString("pu"),
+            JuegoH(id, g.optString("t"), g.optString("pl"), g.optString("es").ifBlank { "PENDIENTE" }, g.optBoolean("f"), g.optLong("fi"), g.optLong("an"), g.optLong("ul"), g.optString("pu").ifBlank { g.optString("pa") },
                 (clavesLanz + claves).distinct(), g.optInt("dh"), g.optInt("de"), g.optInt("dc"),
                 (propias[id]?.values?.sum() ?: 0L) + (externas[id]?.values?.sum() ?: 0L), g.optLong("mod"))
         }.sortedBy { normName(it.titulo) }
@@ -102,7 +105,7 @@ object Hermanas {
 
     /** Un libro tal como lo tiene Marfil. */
     class LibroM(val clave: String, val titulo: String, val autor: String, val estado: String, val favorito: Boolean, val anadido: Long, val ultima: Long, val fraccion: Float,
-                 val paginas: Int, val terminados: List<Long>, val ms: Long, val mod: Long) {
+                 val paginas: Int, val terminados: List<Long>, val ms: Long, val mod: Long, val portadaUrl: String = "") {
         /** El nombre del libro en la cuenta (los 20 primeros hex del SHA-1 de la clave). */
         val kid: String get() = kidDe(clave)
     }
@@ -128,7 +131,7 @@ object Hermanas {
         return fichas.map { (k, g) ->
             val tm = g.optJSONArray("tm")?.let { t -> (0 until t.length()).map { t.optLong(it) }.filter { it > 0 } } ?: emptyList()
             LibroM(k, g.optString("t"), g.optString("a"), g.optString("e").ifBlank { "PENDIENTE" }, g.optBoolean("f"), g.optLong("an"), g.optLong("ul"), g.optDouble("fr", 0.0).toFloat(),
-                g.optInt("pg"), tm, ms[k]?.values?.sum() ?: 0L, g.optLong("mod"))
+                g.optInt("pg"), tm, ms[k]?.values?.sum() ?: 0L, g.optLong("mod"), g.optString("pu"))
         }.sortedBy { normName(it.titulo) }
     }
 
@@ -374,13 +377,17 @@ object Hermanas {
     }
 
     private fun portadaLibro(c: Context, l: LibroM, portadas: JSONObject?): String {
-        val e = portadas?.optJSONObject(l.kid) ?: return ""
-        if (e.optInt("x") == 1) return ""
-        val id = e.optLong("f"); val u = e.optLong("u")
-        if (id <= 0L || !KDrive.on(c)) return ""
-        val dest = File(File(c.filesDir, "hermanas").apply { mkdirs() }, "m_${l.kid}_$u.jpg")
-        if (!dest.exists()) runCatching { KDrive.download(c, id, dest) }.onFailure { dest.delete() }
-        return if (dest.exists() && dest.length() > 200) "file://" + dest.absolutePath else ""
+        val e = portadas?.optJSONObject(l.kid)
+        if (e != null && e.optInt("x") != 1) {
+            val id = e.optLong("f"); val u = e.optLong("u")
+            if (id > 0L && KDrive.on(c)) {
+                val dest = File(File(c.filesDir, "hermanas").apply { mkdirs() }, "m_${l.kid}_$u.jpg")
+                if (!dest.exists()) runCatching { KDrive.download(c, id, dest) }.onFailure { dest.delete() }
+                if (dest.exists() && dest.length() > 200) return "file://" + dest.absolutePath
+            }
+        }
+        // Sin kDrive (o sin portada tuya en él): la dirección de la que elegiste de internet, que viaja con el libro (Marfil 0.12.0)
+        return l.portadaUrl
     }
 
     /**

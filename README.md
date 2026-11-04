@@ -9,6 +9,14 @@ Hermana de [Hiedra](https://github.com/Gonvegato/hiedra) (juegos), [Marfil](http
 y aquí aparecen solos, con su estado, sus horas y sus portadas, para valorarlos. Las películas, las series y tus categorías propias siguen
 aquí tal cual (con su «Añadir»).
 
+## 1.1.0: las mismas portadas que en Hiedra y Marfil, y los Escritos en Marfil
+
+- **Portadas**: un juego o un libro enseña aquí la misma portada que tiene en Hiedra o en Marfil. Las de internet viajan con la ficha (`pu`;
+  Hiedra manda también la caja automática de libretro, `pa`), y las que pusiste de tu galería llegan por kDrive (hace falta el token en
+  Ajustes). Hiedra 0.3.0 y Marfil 0.12.0 o más nuevas.
+- **Escritos**: con Marfil en el móvil, «Leer en Marfil →» (en la portada y en Escritos) abre Marfil en sus Escritos, donde cada obra de
+  Cobalto se lee con su lector. Sin Marfil, se siguen leyendo aquí.
+
 ## 1.0.0: la primera
 
 - **Lo que se queda de Atrio**: la portada de revista (cabecera, número y fecha, las barras de lectura, «En portada», tu pareja), las

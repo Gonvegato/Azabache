@@ -87,7 +87,10 @@ fun LecturaCobaltoScreen(onBack: () -> Unit) {
             if (o == null) {
                 Text("SECCIÓN", color = ColGeneral, fontSize = 12.sp, fontWeight = FontWeight.Black, letterSpacing = 1.5.sp)
                 FitTitle("Escritos", 44.sp, 46.sp, fontWeight = FontWeight.Bold, modifier = Modifier.fillMaxWidth())
-                Text("Los capítulos que diste por terminados en Cobalto. Aquí solo se leen.", color = Muted, fontFamily = Display, fontStyle = FontStyle.Italic, fontSize = 16.sp, modifier = Modifier.padding(top = 6.dp, bottom = 16.dp))
+                val marfil = remember { Hermanas.instalada(ctx, Hermanas.PAQ_MARFIL) }
+                Text(if (marfil) "Los capítulos que diste por terminados en Cobalto. Se leen con el lector de Marfil; aquí, solo de un vistazo." else "Los capítulos que diste por terminados en Cobalto. Aquí solo se leen (con Marfil en el móvil, con su lector).",
+                    color = Muted, fontFamily = Display, fontStyle = FontStyle.Italic, fontSize = 16.sp, modifier = Modifier.padding(top = 6.dp, bottom = if (marfil) 8.dp else 16.dp))
+                if (marfil) Text("Leer en Marfil →", color = ColGeneral, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.padding(bottom = 16.dp).clickable { Hermanas.leerEnMarfil(ctx) })
                 val obras = caps.groupBy { it.obra }
                 if (obras.isEmpty()) Text(if (Hermanas.ultimaVez(ctx) == 0L) "Todavía no se ha leído tu cuenta: entra en Ajustes → Cuenta." else "Cobalto aún no ha publicado ningún capítulo terminado.", color = Muted, fontFamily = Display, fontStyle = FontStyle.Italic, fontSize = 16.sp)
                 obras.forEach { (id, cs) ->

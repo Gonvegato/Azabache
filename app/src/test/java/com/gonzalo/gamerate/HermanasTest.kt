@@ -69,8 +69,17 @@ class HermanasTest {
         assertEquals("https://x/nueva.jpg", e3.plays[0].cover)
     }
 
-    private fun libroM(k: String, t: String, a: String, e: String = "PENDIENTE", mod: Long = 100, msp: Long = 0, tm: List<Long> = emptyList(), pg: Int = 0) =
-        JSONObject().put("k", k).put("t", t).put("a", a).put("e", e).put("mod", mod).put("msp", msp).put("an", 1_700_000_000_000L).put("ul", 1_700_000_000_000L).put("pg", pg).put("fr", 0.5).put("tm", JSONArray(tm))
+    @Test fun sinPortadaTuyaHiedraMandaLaCajaAutomatica() {
+        // Hiedra 0.3.0: «pu» es la que elegiste de internet; «pa», la caja de libretro cuando no hay ninguna tuya
+        val sinPu = juegoH("j2", "Metroid").put("pu", "").put("pa", "https://thumbnails.libretro.com/x/Metroid.png")
+        val js = Hermanas.juegosDe(mapOf("A" to blobH(sinPu, juegoH("j3", "Hades").put("pa", "https://thumbnails.libretro.com/x/Hades.png"))))
+        assertEquals("https://thumbnails.libretro.com/x/Metroid.png", js.first { it.id == "j2" }.portadaUrl)
+        assertEquals("la tuya manda sobre la automática", "https://x/j3.jpg", js.first { it.id == "j3" }.portadaUrl)
+        assertEquals("", Hermanas.juegosDe(mapOf("A" to blobH(juegoH("j4", "Nada").put("pu", "")))).single().portadaUrl)
+    }
+
+    private fun libroM(k: String, t: String, a: String, e: String = "PENDIENTE", mod: Long = 100, msp: Long = 0, tm: List<Long> = emptyList(), pg: Int = 0, pu: String = "") =
+        JSONObject().put("k", k).put("t", t).put("a", a).put("e", e).put("mod", mod).put("msp", msp).put("an", 1_700_000_000_000L).put("ul", 1_700_000_000_000L).put("pg", pg).put("fr", 0.5).put("tm", JSONArray(tm)).put("pu", pu)
     private fun blobM(vararg ls: JSONObject) = JSONObject().put("v", 1).put("libros", JSONArray().also { x -> ls.forEach { x.put(it) } }).put("borrados", JSONObject())
 
     @Test fun losLibrosDeMarfilSonFichasDeLibros() {
@@ -82,6 +91,14 @@ class HermanasTest {
         val n = e.games.single(); assertEquals("Nada", n.name); assertTrue(Hermanas.sinValorar(n)); assertEquals(LocalDate.of(2023, 11, 14).toEpochDay(), n.end)
         assertEquals(customItemId("Dune"), enl["libro:dune:herbert"])
         assertFalse(Hermanas.reflejarLibros(libros, e.games, e.plays, enl, ahora = 2).cambio)
+    }
+
+    @Test fun laPortadaDeInternetDeMarfilViajaConElLibro() {
+        // Marfil 0.12.0: «pu» es la dirección de la portada elegida de internet; vacío si es de la galería (esa va por kDrive)
+        val libros = Hermanas.librosDe(mapOf("A" to blobM(libroM("libro:dune:herbert", "Dune", "Frank Herbert", pu = "https://covers.openlibrary.org/b/id/1-L.jpg"), libroM("libro:nada:laforet", "Nada", "Carmen Laforet"))))
+        assertEquals("https://covers.openlibrary.org/b/id/1-L.jpg", libros.first { it.titulo == "Dune" }.portadaUrl); assertEquals("", libros.first { it.titulo == "Nada" }.portadaUrl)
+        val e = Hermanas.reflejarLibros(libros, emptyList(), emptyList(), HashMap(), portada = { it.portadaUrl }, ahora = 1)
+        assertEquals("https://covers.openlibrary.org/b/id/1-L.jpg", e.plays.first { it.name == "Dune" }.cover); assertEquals("", e.plays.first { it.name == "Nada" }.cover)
     }
 
     @Test fun elTiempoDeCadaDiaSaleDeLosNodosLigeros() {
