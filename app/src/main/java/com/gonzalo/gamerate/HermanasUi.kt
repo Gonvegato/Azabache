@@ -31,7 +31,7 @@ fun LecturaMarfil(id: Long, nombre: String, paginas: Int, minutos: Int) {
     } else Text("Marfil aún no ha contado tiempo de este libro.", color = Muted, fontFamily = Display, fontStyle = FontStyle.Italic, fontSize = 15.sp)
     if (paginas > 0) Text("$paginas páginas", color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 4.dp))
     Spacer(Modifier.height(6.dp))
-    if (Hermanas.instalada(ctx, Hermanas.PAQ_MARFIL)) MagLink("Leer en Marfil", accent = true) { Hermanas.abrir(ctx, Hermanas.PAQ_MARFIL) }
+    if (Hermanas.instalada(ctx, Hermanas.PAQ_MARFIL)) MagLink("Leer en Marfil", accent = true) { Hermanas.leerEnMarfil(ctx, id) }
     else Text("Se lee en Marfil (no está en este móvil).", color = Muted, fontFamily = Display, fontStyle = FontStyle.Italic, fontSize = 13.sp)
 }
 
@@ -59,7 +59,9 @@ fun RevistaEscritos(irAEscritos: () -> Unit) {
         FitTitle(ultimo.titulo.ifBlank { "Sin título" }, 30.sp, 33.sp, color = Charcoal, fontWeight = FontWeight.Bold, modifier = Modifier.fillMaxWidth().clickable(onClick = irAEscritos))
         Text(listOfNotNull("último capítulo terminado: «${ultimo.nombre.ifBlank { "capítulo ${ultimo.numero}" }}»", if (semana > 0) "esta semana ${cifraE(semana)} palabras" else null).joinToString(" · "),
             color = Muted, fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp))
-        Text("Leer lo terminado →", color = ColGeneral, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.padding(top = 10.dp).clickable(onClick = irAEscritos))
+        val marfil = remember { Hermanas.instalada(ctx, Hermanas.PAQ_MARFIL) }
+        Text(if (marfil) "Leer en Marfil →" else "Leer lo terminado →", color = ColGeneral, fontWeight = FontWeight.Bold, fontSize = 16.sp,
+            modifier = Modifier.padding(top = 10.dp).clickable { if (!marfil || !Hermanas.leerEnMarfil(ctx, ultimo.obra)) irAEscritos() })
     }
 }
 
@@ -98,6 +100,7 @@ fun LecturaCobaltoScreen(onBack: () -> Unit) {
                     Column(Modifier.fillMaxWidth().clickable { obra = id }.padding(vertical = 10.dp)) {
                         Text(t.titulo.ifBlank { "Sin título" }, fontFamily = Display, fontWeight = FontWeight.Bold, fontSize = 24.sp)
                         Text(listOfNotNull(t.autor.ifBlank { null }, "${cs.size} ${if (cs.size == 1) "capítulo" else "capítulos"}", "${cifraE(cs.sumOf { it.palabras })} palabras").joinToString(" · "), color = Muted, fontSize = 13.sp)
+                        if (marfil) Text("Leer en Marfil →", color = ColGeneral, fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.padding(top = 6.dp).clickable { Hermanas.leerEnMarfil(ctx, id) })
                     }
                     Filete()
                 }

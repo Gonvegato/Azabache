@@ -58,7 +58,11 @@ object Hermanas {
         c.startActivity(i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); return true
     }
     /** Abre Marfil en sus «Escritos» (Marfil 0.12.0 o más nueva), donde los capítulos de Cobalto se leen con su lector. */
-    fun leerEnMarfil(c: Context) = abrir(c, PAQ_MARFIL, "escritos")
+    fun leerEnMarfil(c: Context, obra: String = ""): Boolean {
+        val i = c.packageManager.getLaunchIntentForPackage(PAQ_MARFIL) ?: return false
+        i.putExtra("go", "escritos"); if (obra.isNotBlank()) i.putExtra("obra", obra)
+        c.startActivity(i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); return true
+    }
 
     // ================================================================ lo que sube cada una (sin red: se puede probar)
 

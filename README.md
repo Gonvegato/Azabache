@@ -9,6 +9,10 @@ Hermana de [Hiedra](https://github.com/Gonvegato/hiedra) (juegos), [Marfil](http
 y aquí aparecen solos, con su estado, sus horas y sus portadas, para valorarlos. Las películas, las series y tus categorías propias siguen
 aquí tal cual (con su «Añadir»).
 
+## 1.1.3
+
+- «Leer en Marfil» (en la portada y en cada obra de Escritos) abre Marfil **leyendo esa obra** (Marfil 0.12.3 o más nueva).
+
 ## 1.1.2: «Jugar» y «Leer» van a la ficha exacta
 
 - «Jugar» en una ficha que vino de Hiedra abre Hiedra **en ese juego** (y, si es del PC, directo a jugar); «Leer» en un libro de Marfil abre
