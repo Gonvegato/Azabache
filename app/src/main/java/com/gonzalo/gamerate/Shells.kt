@@ -319,8 +319,8 @@ private fun RevistaHome(m: ShellModel) {
             }
         }
 
-        // Escribiendo: tu novela, lo de hoy y seguir con la última escena
-        if (!m.readOnly && m.write != null) RevistaEscribiendo(m.write)
+        // Escritos: lo último que diste por terminado en Cobalto
+        if (!m.readOnly && m.write != null) RevistaEscritos(m.write)
 
         // Tu pareja: lo que te recomienda y lo último que ha hecho
         RevistaPareja(m)
@@ -401,30 +401,6 @@ private fun RevistaPareja(m: ShellModel) {
     }
 }
 
-/** «Escribiendo» en la portada: la obra en la que estás, lo escrito hoy y seguir con la última escena. */
-@Composable
-private fun RevistaEscribiendo(irAEscribir: () -> Unit) {
-    val ctx = LocalContext.current
-    val e = remember { Escritos.get(ctx) }
-    val ver = e.version
-    val s = remember(ver) { e.ultimaEscena() } ?: return
-    val obra = e.get(s.pid) ?: return
-    val hoy = remember(ver) { e.escritas(Escritos.hoy()) }
-    val racha = remember(ver) { e.racha() }
-    val total = remember(ver, obra.id) { e.palabrasObra(obra.id) }
-    val meta = obra.i("meta")
-    Column(Modifier.fillMaxWidth()) {
-        Spacer(Modifier.height(38.dp))
-        RevSection("Escribiendo")
-        FitTitle(obra.s("titulo").ifBlank { "Sin título" }, 30.sp, 33.sp, color = Ink2, fontWeight = FontWeight.Bold, modifier = Modifier.fillMaxWidth().press(haptic = false, onClick = irAEscribir))
-        Text(listOfNotNull(obra.s("genero").ifBlank { null }, cifraE(total) + (if (meta > 0) " de ${cifraE(meta)} palabras" else " palabras"), if (hoy > 0) "hoy ${cifraE(hoy)}" else null, if (racha > 1) "$racha días seguidos" else null).joinToString(" · "),
-            color = Grey2, fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp))
-        if (meta > 0) Box(Modifier.padding(top = 8.dp)) { Bar((total.toFloat() / meta).coerceIn(0f, 1f), Red2, height = 3.dp) }
-        Text("Seguir con «${s.s("titulo").ifBlank { "Sin título" }}»\u00A0→", color = Red2, fontWeight = FontWeight.Bold, fontSize = 16.sp,
-            modifier = Modifier.padding(top = 10.dp).press { EscribirHub.abrir = s.id to System.currentTimeMillis(); irAEscribir() })
-    }
-}
-
 /**
  * Las secciones, como el menú del PC y en el mismo orden: cada categoría (con su nombre), Diario, Escribir, Descubrir,
  * Cifras, Tu PC y Ajustes. En versalitas y en las líneas que hagan falta (todo a la vista, sin deslizar).
@@ -433,7 +409,7 @@ private fun RevistaEscribiendo(irAEscribir: () -> Unit) {
 @Composable
 private fun RevistaMenu(m: ShellModel) {
     val items = m.kinds.map { k -> k.title to { m.library(k) } } +
-        listOfNotNull("Diario" to m.diary, m.write?.let { "Escribir" to it }, "Cifras" to { m.stats(GAMES) })
+        listOfNotNull("Diario" to m.diary, m.write?.let { "Escritos" to it }, "Cifras" to { m.stats(GAMES) })
     Column(Modifier.fillMaxWidth().padding(top = 18.dp)) {
         Rule(1.dp)
         androidx.compose.foundation.layout.FlowRow(Modifier.fillMaxWidth().padding(vertical = 4.dp), horizontalArrangement = Arrangement.spacedBy(18.dp)) {

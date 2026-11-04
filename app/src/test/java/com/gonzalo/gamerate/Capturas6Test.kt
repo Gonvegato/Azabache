@@ -172,10 +172,6 @@ open class Capturas6Test {
         org.junit.Assert.assertTrue("vuelve a la página de la ficha", rule.onAllNodesWithText("EDITAR", ignoreCase = true).fetchSemanticsNodes().isNotEmpty())
         rule.onAllNodesWithText("EDITAR", ignoreCase = true)[0].performClick(); rule.waitForIdle()
         rule.onAllNodesWithText("⇔", ignoreCase = true)[0].performTouchInput { swipeRight() }; shoot("r8b_linea_movida")
-        rule.onAllNodesWithText("Ninguna todavía.", ignoreCase = true)[0].performClick(); shoot("r8c_elegir")
-        // Elegir «Opinión» para la casilla de las guías
-        // (la de la lista del diálogo: la última; la primera puede ser la etiqueta de una casilla de detrás)
-        rule.onAllNodesWithText("Opinión", ignoreCase = true).let { it[it.fetchSemanticsNodes().size - 1] }.performClick(); shoot("r8d_elegida")
         // (Los diálogos con campos de texto no se quedan quietos en Robolectric: el texto libre se mete directamente)
         rule.runOnUiThread {
             MagLayouts.save(ctx, "v:0:102", listOf(
@@ -298,36 +294,10 @@ open class Capturas6Test {
             }
         }
         rule.onAllNodesWithText("El nombre del viento", ignoreCase = true)[0].let { n -> runCatching { n.performScrollTo() }; n.performClick() }; shoot("s1_libro")
-        rule.onAllNodesWithText("SUBRAYADOS Y NOTAS", ignoreCase = true)[0].performScrollTo(); shoot("s2_libro_subrayados")
+        rule.onAllNodesWithText("LECTURA", ignoreCase = true)[0].performScrollTo(); shoot("s2_libro_lectura")
     }
 
-    @Test
-    fun testJuegosPareja() {
-        org.junit.Assume.assumeTrue(System.getProperty("roborazzi.test.record") == "true")
-        val store = seed()
-        Skin.load(ctx)
-        Mode.dark = false
-        Mode.themeMode = 1
-        Skin.applyShell(2, ctx)
-        val theirs = QuizRun(System.currentTimeMillis() - 86_400_000L, listOf(QuizItem(0, false, 3328, "The Witcher 3", "The Witcher 3", "2015", "", "Rol (RPG)")))
-        val partner = Partner("Laura", 0L, emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyMap(), 0, 0, quizzes = mapOf(0 to theirs))
-        rule.setContent {
-            MaterialTheme(colorScheme = appColors(), typography = AppTypography) {
-                Surface(Modifier.fillMaxSize(), color = Paper) {
-                    QuizScreen(0, store, emptySet(), partner, onAdd = {}, onBack = {})
-                }
-            }
-        }
-        shoot("t1_test_juegos")
-        rule.onAllNodesWithText("5", ignoreCase = true)[0].performClick(); shoot("t2_pregunta_juegos")
-        // Coincidencias: la cuenta del aviso a la pareja
-        val mine = listOf(QuizItem(0, false, 3328, "The Witcher 3", "The Witcher 3", "2015", "", ""), QuizItem(0, false, 1, "Otro", "Otro", "2020", "", ""))
-        org.junit.Assert.assertEquals(listOf("The Witcher 3"), quizMatches(mine, theirs.items).map { it.title })
-        val back = quizRunsFromJson(org.json.JSONObject().put("0", quizRunToJson(theirs)))
-        org.junit.Assert.assertEquals("The Witcher 3", back[0]?.items?.first()?.title)
-    }
-
-    /** Buscar un libro que no aparece: la primera fila lo añade tal cual lo has escrito. */
+        /** Buscar un libro que no aparece: la primera fila lo añade tal cual lo has escrito. */
     @Test
     fun anadirTalCual() {
         org.junit.Assume.assumeTrue(System.getProperty("roborazzi.test.record") == "true")
@@ -480,10 +450,7 @@ open class Capturas6Test {
         shoot("p00a_portada"); go("Videojuegos"); go("Pasados"); go("Hades II"); shoot("p00_foto_llena")
         rule.onRoot().performTouchInput { swipeUp() }; shoot("p00b_foto_original")
         home()
-        go("Videojuegos"); go("DESCUBRIR\u00A0→"); shoot("p01_descubrir")
-        rule.onRoot().performTouchInput { swipeUp() }; shoot("p01b_descubrir_filtros")
-        go("5"); shoot("p02_pregunta"); back(); back()
-        go("Libros"); go("DESCUBRIR\u00A0→"); shoot("p03_descubrir_libro"); home()
+        go("Escritos"); shoot("p01_escritos"); home()
         go("Diario"); shoot("p04_diario"); home()
         go("Cifras"); shoot("p05_estadisticas"); home()
         icono("Ajustes"); shoot("p06_perfil")
@@ -491,19 +458,13 @@ open class Capturas6Test {
         go("Servicios y copias"); shoot("p07_ajustes")
         rule.onRoot().performTouchInput { swipeUp() }; shoot("p07b_ajustes"); home()
         go("Videojuegos"); shoot("p08_biblioteca")
-        go("+ AÑADIR"); shoot("p09_buscar"); back()
         go("Deadlock"); go("Apuntar\u00A0→"); shoot("p10_apunte"); back(); home()
         icono("Ajustes"); go("Apariencia"); shoot("p11_apariencia"); back(); home()
-        icono("Tu PC"); shoot("p12_pc"); home()
         go("Cifras"); go("VER TU ${java.time.LocalDate.now().year}, NÚMERO ESPECIAL\u00A0→"); shoot("p15_especial")
         // El número especial es un diálogo: tiene su propia raíz
         val dlg = { rule.onAllNodes(androidx.compose.ui.test.isRoot()).let { it[it.fetchSemanticsNodes().size - 1] } }
         dlg().performTouchInput { swipeUp() }; shoot("p15b_especial")
         dlg().performTouchInput { swipeUp() }; shoot("p15c_especial"); back(); home()
-        go("Libros"); go("DESCUBRIR\u00A0→"); go("5")
-        repeat(5) { i -> rule.waitForIdle(); Thread.sleep(300); rule.onAllNodesWithText(if (i % 2 == 0) "A" else "B")[0].performClick() }
-        rule.waitUntil(60_000) { rule.onAllNodesWithText("A MI LISTA +", ignoreCase = true).fetchSemanticsNodes().isNotEmpty() || rule.onAllNodesWithText("No ha salido nada", substring = true).fetchSemanticsNodes().isNotEmpty() }
-        shoot("p13_resultados")
-        if (rule.onAllNodesWithText("% PARA TI", ignoreCase = true).fetchSemanticsNodes().isNotEmpty()) { rule.onAllNodesWithText("% PARA TI", ignoreCase = true)[0].performClick(); shoot("p14_ficha_resultado") }
+
     }
 }

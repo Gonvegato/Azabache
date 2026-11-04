@@ -1,0 +1,43 @@
+# Lo que Azabache lee (y lo que escribe)
+
+Azabache es la revista de la familia: **no añade juegos ni libros**. Los lee de lo que sus hermanas suben a tu cuenta de Firebase y los
+refleja en sus propias listas, donde se valoran. Los contratos de cada una están en sus repos:
+
+- Hiedra (juegos): `hiedra/docs/CONTRATO-DATOS.md` → `/users/<uid>/hiedra/`
+- Marfil (libros): `lectura-app/docs/CONTRATO-DATOS.md` → `/users/<uid>/marfil/`
+- Cobalto (lo escrito): `cobalto/docs/CONTRATO-DATOS.md` → `/users/<uid>/cobalto/`
+
+## Lo que lee
+
+| De | Nodo | Para qué |
+|---|---|---|
+| Hiedra | `stamps`, `dev/<dispositivo>/data` | La biblioteca de juegos: se mezclan los dispositivos por `id` (gana el `mod` más reciente; las horas `msp` se suman por dispositivo y las `ex` por máximo). Cada juego pasa a una ficha de Azabache: `PASADO` → valorado; `JUGANDO`/`PENDIENTE`/`ABANDONADO` → en curso (estados 1/0/2). |
+| Hiedra | `tiempo/<id>/<fuente>` | Lo jugado cada día (las fuentes se suman), para el Diario y el calendario. |
+| Hiedra | `nube/portadas/<id>` | La portada que pusiste tú (se baja de kDrive si Azabache tiene tu token). |
+| Marfil | `stamps`, `dev/<dispositivo>/data` | La biblioteca de libros: por clave `k`; `LEIDO` → valorado (con la última fecha de `tm`), `LEYENDO`/`PENDIENTE` → en curso. |
+| Marfil | `tiempo/<kid>/<escritor>` | Lo leído cada día: por dispositivo y día el máximo entre escritores, y luego se suman los dispositivos. |
+| Marfil | `portadas/<kid>` | Tu portada en kDrive (`f`, `u`; `x` = quitada). |
+| Cobalto | `palabras/<dispositivo>` | Las palabras escritas cada día (se suman los dispositivos): el Diario. |
+| Cobalto | `lectura/<obra>/<capítulo>` | Los capítulos terminados, para leerlos en «Escritos». |
+
+Se mira al abrir la app, al vincular la cuenta, al entrar en el Diario y en cuanto una hermana sube algo (se escucha `stamps` de las tres).
+
+## Cómo se enlaza
+
+- Una ficha reflejada lleva un **id fijo que sale del nombre** (el de siempre de las fichas propias, `customItemId`): dos móviles con
+  Azabache crean la misma y al sincronizar no se duplican. Lo que ya tenías con el mismo nombre se enlaza y se completa.
+- El enlace id de Hiedra → id de aquí (y clave de Marfil → id) se guarda en el móvil (`hermanas`), y es lo que usan el Diario y las portadas.
+- Lo que manda la hermana: nombre, plataforma, autor, estado, horas, páginas, duraciones, fechas de empezado/pasado, favorito y la portada
+  (solo si no la has cambiado tú). Lo que es de Azabache y nunca se toca: la nota, los criterios, la reseña, las casillas de la página.
+- Una ficha reflejada sin nota tiene todas las notas a **0**: es «sin valorar» (se ve así en su página, no cuenta en las cifras). Una ficha ya
+  valorada no vuelve a «en curso» aunque la hermana diga que la rejuegas o relees: la nota manda.
+
+## Lo que escribe
+
+Lo de siempre de Atrio, en `/users/<uid>/dev/<dispositivo>/data` y `stamps`: las fichas (con las reflejadas), las notas, el diario, las sagas,
+las maquetas, la lista negra, las claves de servicios (`keys`: SteamGridDB, Steam, RAWG, IGDB; las usan Hiedra y Marfil). Atrio del PC
+sigue leyendo este mismo nodo. Azabache **no escribe** en los nodos de las hermanas.
+
+## Lo que Hiedra y Marfil leen de Azabache
+
+La valoración: `general` y `review` de cada ficha (por nombre y por la clave `juego:<título normalizado>`), como hasta ahora con Atrio.

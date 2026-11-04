@@ -164,7 +164,7 @@ object Sincro {
         escucha(c)
         bajaPronto()
         if (Store(c).pendiente) pronto(c, 0)
-        if (Store(c).paired) Escritos.pronto(c, 0)
+        if (Store(c).paired) Hermanas.pronto(c)
     }
 
     internal fun alSalir() {
@@ -172,8 +172,6 @@ object Sincro {
         para()
         val c = app ?: return
         if (Store(c).pendiente) pronto(c, 0)
-        // Lo escrito que no haya subido: ahora, y si no hay red, cuando la haya
-        if (Store(c).paired && Escritos.get(c).pendientes().isNotEmpty()) { Escritos.pronto(c, 0); CloudSave.enqueue(c) }
     }
 
     /** Tras entrar o salir de la cuenta, o cambiar de pareja: se vuelve a escuchar lo que toca. */
@@ -181,7 +179,7 @@ object Sincro {
         init(ctx)
         para()
         if (visible) app?.let { escucha(it); bajaPronto() }
-        app?.let { c -> val st = Store(c); if (st.paired) { Escritos.get(c).cuenta(st.accUid); Escritos.pronto(c, 0) } }
+        app?.let { c -> if (Store(c).paired) Hermanas.pronto(c, ya = true) }
     }
 
     private fun url(st: Store, path: String, force: Boolean): String? =
@@ -201,12 +199,8 @@ object Sincro {
         escuchas += FbStream("cuenta", { f -> url(st, "/users/$uid/stamps", f) }, { _, path ->
             if (path.trim('/') != yo) bajaPronto()
         })
-        // Lo que escribes (Escribir): cada documento que sube otro dispositivo cambia su hora en el índice
-        escuchas += FbStream("escritos", { f -> url(st, "/users/$uid/escritosIdx", f) }, { _, _ -> Escritos.bajaPronto(c) })
-        // Lo jugado en tus PC (el diario y el calendario)
-        escuchas += FbStream("horas", { f -> url(st, "/users/$uid/horasAt", f) }, { _, _ ->
-            scope.launch { runCatching { HorasPc.bajar(c, st, uid, ya = true) } }
-        })
+        // Las hermanas: en cuanto Hiedra, Marfil o Cobalto suben algo, se refleja aquí
+        for (app in listOf("hiedra", "marfil", "cobalto")) escuchas += FbStream("hermana-$app", { f -> url(st, "/users/$uid/$app/stamps", f) }, { _, _ -> Hermanas.pronto(c, ya = true) })
         // Tu pareja: lo que valora, lee o escribe aparece al momento (si te deja verlo)
         // (si aún no te deja verlo, Firebase dice «sin permiso»: no es cosa de tu sesión, así que no se renueva por eso)
         if (pareja.isNotBlank()) escuchas += FbStream("pareja", { _ -> url(st, "/users/$pareja/stamps", false) }, { _, _ -> parejaPronto() })

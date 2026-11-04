@@ -402,7 +402,7 @@ fun SagaScreen(
                             val p = next.play
                             // Un libro con su archivo en el móvil, directamente al lector
                             if (next.reading && kind.gerund.isNotEmpty()) MagLink("Seguir ${kind.gerund}", accent = true) {
-                                if (kind.isBook && BookFiles.get(ctx, next.id) != null) ReaderActivity.open(ctx, next.id, next.name) else onOpenBook(next)
+                                if (kind.isBook && Hermanas.abrir(ctx, Hermanas.PAQ_MARFIL)) {} else if (kind.isGame && Hermanas.abrir(ctx, Hermanas.PAQ_HIEDRA)) {} else onOpenBook(next)
                             }
                             else if (!next.reading && p != null) MagLink(if (kind.verb.isNotEmpty()) "Empezar a ${kind.verb}" else "Empezar", accent = true) { onStart(p) }
                             else MagLink("Abrir su ficha") { onOpenBook(next) }

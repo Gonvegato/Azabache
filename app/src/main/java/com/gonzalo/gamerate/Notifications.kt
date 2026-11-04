@@ -89,8 +89,6 @@ class CloudWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ctx,
         if (store.paired && store.pendiente) {
             try { Couple.push(store) } catch (e: Exception) { retry = true }
         }
-        // Lo que escribes (Escribir): sube lo pendiente y baja lo nuevo
-        if (store.paired && !Escritos.sincroniza(applicationContext)) retry = true
         if (store.driveUri.isNotBlank()) DriveBackup.save(applicationContext, store)
         return if (retry && runAttemptCount < 5) Result.retry() else Result.success()
     }
@@ -134,7 +132,7 @@ object LecturaAviso {
     }
 
     /** Lo leído hoy (ms, todos tus libros). */
-    fun hoy(ctx: Context): Long = BookFiles.leidoPorDia(ctx)[LocalDate.now().toEpochDay()]?.values?.sum() ?: 0L
+    fun hoy(ctx: Context): Long = Hermanas.leidoPorDia(ctx)[LocalDate.now().toEpochDay()]?.values?.sum() ?: 0L
 
     /** El libro que leíste por última vez (y que tiene su archivo aquí): id y lo que llevas (0–1). */
     fun ultimo(ctx: Context): Pair<Long, Double>? {
@@ -163,9 +161,8 @@ object LecturaAviso {
         nm.createNotificationChannel(NotificationChannel("lectura", "Objetivo de lectura", NotificationManager.IMPORTANCE_DEFAULT))
         val u = ultimo(ctx)
         val nombre = u?.let { (id, _) -> st.loadPlays(BOOKS.id).find { it.id == id }?.name ?: st.load(BOOKS.id).find { it.id == id }?.name }
-        val intent = if (u != null && nombre != null)
-            Intent(ctx, ReaderActivity::class.java).putExtra("id", u.first).putExtra("name", nombre).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        else Intent(ctx, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        val intent = ctx.packageManager.getLaunchIntentForPackage(Hermanas.PAQ_MARFIL)?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            ?: Intent(ctx, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         val pi = PendingIntent.getActivity(ctx, 2003, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val titulo = if (min < 1) "Hoy aún no has leído" else "Hoy llevas $min de $meta min de lectura"
         val texto = if (nombre != null) "Sigue con «$nombre»" + (u.second.takeIf { it > 0.005 }?.let { " · vas por el ${(it * 100).toInt()} %" } ?: "")
@@ -214,7 +211,7 @@ object DiarioAviso {
     fun loDeHoy(ctx: Context, st: Store = Store(ctx)): String {
         val hoy = LocalDate.now().toEpochDay()
         val leido = LecturaAviso.hoy(ctx)
-        val jugado = runCatching { HorasPc.porDia(ctx, st.accUid)[hoy]?.values?.sum() ?: 0L }.getOrDefault(0L)
+        val jugado = runCatching { Hermanas.jugadoPorDia(ctx)[hoy]?.values?.sum() ?: 0L }.getOrDefault(0L)
         val p = ArrayList<String>()
         if (leido >= 60_000L) p += "${readTime((leido + 30_000L) / 60_000L)} leyendo"
         if (jugado >= 60_000L) p += "${readTime((jugado + 30_000L) / 60_000L)} jugando"

@@ -277,12 +277,16 @@ fun RevistaGameRead(
     Spacer(Modifier.height(14.dp))
 
     val defs = linkedMapOf<String, MagDef>()
-    if (kind.isGame) defs["guias"] = MagDef("Guías") { GuidesSection(g.id, g.name, inCell = true) }
-    defs["nota"] = MagDef("Nota") { MagScore(g.general, g.scores(), kind) }
+    defs["nota"] = MagDef("Nota") {
+        if (Hermanas.sinValorar(g)) {
+            Text("Sin valorar", fontFamily = Display, fontWeight = FontWeight.Bold, fontSize = 30.sp, lineHeight = 32.sp)
+            Text(if (kind.isBook) "Lo diste por leído en Marfil." else if (kind.isGame) "Lo diste por pasado en Hiedra." else "Aún sin nota.", color = Muted, fontFamily = Display, fontStyle = FontStyle.Italic, fontSize = 15.sp)
+            MagLink("Valorar", accent = true, onClick = onEdit)
+        } else MagScore(g.general, g.scores(), kind)
+    }
     if (kind.isMovie || kind.isTv) defs["critica"] = MagDef("Crítica") { MagCritics(kind, g.id, g.name) }
     if (kind.isMovie || kind.isTv) defs["donde"] = MagDef("Dónde verla") { MagDonde(kind, g.id, g.name) }
-    if (kind.isBook) defs["lectura"] = MagDef("Lectura") { BookFileBar(g.id, g.name) }
-    if (kind.isBook) defs["subrayados"] = MagDef("Subrayados y notas") { BookNotesBox(g.id, g.name) }
+    if (kind.isBook) defs["lectura"] = MagDef("Lectura") { LecturaMarfil(g.id, g.name, g.pages, g.minutes) }
     defs["opinion"] = MagDef("Opinión", "Escribir" to onEdit) {
         if (g.review.isNotBlank()) MagBody(g.review)
         else Text("Aún no has escrito nada.", color = Muted, fontFamily = Display, fontStyle = FontStyle.Italic, fontSize = 17.sp)
@@ -292,7 +296,6 @@ fun RevistaGameRead(
     if (!Mode.viewP && DiarioHub.de(kind.id, g.id).isNotEmpty()) defs["diario"] = MagDef("En tu diario", "Escribir" to { DiarioHub.escribirSobre?.invoke(kind, g.id) }) { DiarioDeFicha(kind, g.id) }
     defs["enlaces"] = MagDef("Enlaces") {
         if (!Mode.viewP) MagLink("Escribir en el diario") { DiarioHub.escribirSobre?.invoke(kind, g.id) }
-        if (kind.isGame) FichaPlayButtons(g.id, g.name, Modifier.padding(bottom = 6.dp))
         if (kind.hasSoundtrack) MagLink("Banda sonora", "YouTube Music") { openSoundtrack(ctx, g.name) }
         SagaLink(g.id, kind)
         PartnerFileLink(g.id, kind)
@@ -304,9 +307,9 @@ fun RevistaGameRead(
     }
     defs["datos"] = MagDef("Datos") { GameFacts(g, kind) }
     val defaults = when {
-        kind.isGame -> magRows(listOf("guias", "nota"), listOf("opinion"), listOf("diario"), listOf("horas", "enlaces"), listOf("datos"))
+        kind.isGame -> magRows(listOf("horas", "nota"), listOf("opinion"), listOf("diario"), listOf("datos", "enlaces"))
         kind.isMovie || kind.isTv -> magRows(listOf("critica", "nota"), listOf("opinion"), listOf("diario"), listOf("datos", "enlaces"), listOf("donde"))
-        kind.isBook -> magRows(listOf("datos", "nota"), listOf("lectura"), listOf("subrayados"), listOf("opinion"), listOf("diario"), listOf("enlaces"))
+        kind.isBook -> magRows(listOf("lectura", "nota"), listOf("opinion"), listOf("diario"), listOf("datos", "enlaces"))
         else -> magRows(listOf("datos", "nota"), listOf("opinion"), listOf("diario"), listOf("enlaces"))
     }
     MagPage("v:${kind.id}:${g.id}", "tpl:v:${kind.id}", kind.title, defaults, defs, kind, g.id, g.name, designing)

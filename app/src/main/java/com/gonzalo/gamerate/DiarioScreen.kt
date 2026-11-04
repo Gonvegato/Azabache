@@ -202,6 +202,15 @@ private fun DiarioDias(
 }
 
 /** Hoy: lo que escribes, lo que llevas y lo que tienes entre manos. */
+/** Lo escrito ese día en Cobalto. */
+@Composable
+private fun PalabrasFila(n: Int) {
+    Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+        Icon(Icons.Rounded.EditNote, null, tint = ColGeneral, modifier = Modifier.size(22.dp))
+        Text("${cifraE(n)} palabras escritas en Cobalto", fontFamily = Display, fontSize = 17.sp, modifier = Modifier.padding(start = 10.dp))
+    }
+}
+
 @Composable
 private fun HoyBloque(d: Dia?, enCurso: List<Pair<Kind, Play>>, soloLectura: Boolean, pareja: String?, nombreDe: (String) -> String?, acc: DiarioAcciones) {
     val hoy = today()
@@ -210,6 +219,7 @@ private fun HoyBloque(d: Dia?, enCurso: List<Pair<Kind, Play>>, soloLectura: Boo
         d?.notas?.forEach { n -> NotaBloque(n, soloLectura, pareja, nombreDe, acc) }
         if (!soloLectura) Escribir(if (d?.notas.isNullOrEmpty()) "¿Qué tal hoy? Lo que has jugado, leído o visto, lo que te ha gustado…" else "Añadir algo más") { acc.escribir(hoy, null) }
         d?.toques?.forEach { t -> ToqueFila(t, acc) }
+        if (d != null && d.palabras > 0) PalabrasFila(d.palabras)
         if (d == null || d.toques.isEmpty()) Text(
             if (soloLectura) "Hoy aún no hay nada." else "Lo que termines, empieces, leas o juegues hoy aparecerá aquí solo.",
             color = Muted, fontFamily = Display, fontStyle = FontStyle.Italic, fontSize = 15.sp, lineHeight = 20.sp, modifier = Modifier.padding(vertical = 8.dp)
@@ -297,6 +307,7 @@ private fun DiaPagina(d: Dia, soloLectura: Boolean, pareja: String?, nombreDe: (
         }
         d.notas.forEach { n -> NotaBloque(n, soloLectura, pareja, nombreDe, acc) }
         d.toques.forEach { t -> ToqueFila(t, acc) }
+        if (d.palabras > 0) PalabrasFila(d.palabras)
         Spacer(Modifier.height(10.dp))
     }
 }
@@ -409,6 +420,7 @@ private fun DiaHoja(d: Dia, soloLectura: Boolean, pareja: String?, nombreDe: (St
                 )
                 d.notas.forEach { n -> NotaBloque(n, soloLectura, pareja, nombreDe, ac) }
                 d.toques.forEach { t -> ToqueFila(t, ac) }
+                if (d.palabras > 0) PalabrasFila(d.palabras)
                 if (!soloLectura) Escribir(if (d.notas.isEmpty()) "Escribir sobre este día" else "Añadir algo más") { onCerrar(); acc.escribir(d.dia, null) }
             }
         }

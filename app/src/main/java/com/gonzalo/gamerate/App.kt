@@ -242,17 +242,16 @@ private fun AppContenido(
         onDispose { life.lifecycle.removeObserver(obs) }
     }
 
-    // ---- La suite: conexión en tiempo real con Atrio mientras la app está delante ----
+    // ---- Las hermanas (Hiedra, Marfil, Cobalto): al volver a la app se mira lo que han subido, y lo nuevo se refleja aquí ----
     DisposableEffect(life) {
         val obs = androidx.lifecycle.LifecycleEventObserver { _, ev ->
-            if (ev == androidx.lifecycle.Lifecycle.Event.ON_START) Suite.start(ctx, store)
-            if (ev == androidx.lifecycle.Lifecycle.Event.ON_STOP) Suite.stop()
+            if (ev == androidx.lifecycle.Lifecycle.Event.ON_START) Hermanas.pronto(ctx)
         }
         life.lifecycle.addObserver(obs)
         onDispose { life.lifecycle.removeObserver(obs) }
     }
-    LaunchedEffect(store.paired) { if (store.paired) Suite.start(ctx, store) }
-    LaunchedEffect(Suite.notice) { Suite.notice?.let { say(it); Suite.notice = null } }
+    LaunchedEffect(store.paired) { if (store.paired) Hermanas.pronto(ctx, ya = true) }
+    LaunchedEffect(Hermanas.version) { if (Hermanas.version > 0) reloadAll() }
 
     // ---- Tu misma cuenta en otro dispositivo: lo que llegue de allí se vuelve a leer aquí ----
     LaunchedEffect(SyncBus.version) {
@@ -652,9 +651,6 @@ private fun AppContenido(
     DiarioHub.escribirSobre = { k, id -> escribiendo = Triple(today(), null, listOf(refDe(k.id, id))) }
     DiarioHub.editar = { n -> escribiendo = Triple(n.dia, n, emptyList()) }
     Negra.alAnadir = { n -> store.addNegra(n); reloadAll(); screen = Screen.Home; say("«$n» a la lista negra: ya no saldrá en ningún sitio") }
-    var guideSheet by remember { mutableStateOf<PcGame?>(null) }
-    // Las guías se abren dentro de la app, encima de lo que estés viendo
-    SideEffect { Guides.opener = { g -> guideSheet = null; WebActivity.open(ctx, g) } }
     // Imágenes para las casillas de las fichas de revista
     SideEffect {
         MagImages.categories = { k ->
@@ -805,21 +801,16 @@ private fun AppContenido(
         }
     }
 
-    // ---- Atrio 6: botón principal de cada tarjeta de «Sigue donde lo dejaste» ----
-    fun pcGameOf(o: Ongoing): PcGame? = if (o.kind.isGame && Suite.target() != null) Guides.pcGameFor(o.play.id, o.play.name) else null
+    // ---- El botón principal de cada tarjeta de «En portada»: jugar (Hiedra) o leer (Marfil) si están, y si no, apuntar ----
     fun primaryLabel(o: Ongoing): Pair<String, androidx.compose.ui.graphics.vector.ImageVector> = when {
-        pcGameOf(o) != null -> "Streaming" to Icons.Rounded.Cast
-        o.kind.isBook && BookFiles.get(ctx, o.play.id) != null -> "Leer" to Icons.Rounded.AutoStories
+        o.kind.isGame && Hermanas.instalada(ctx, Hermanas.PAQ_HIEDRA) -> "Jugar" to Icons.Rounded.SportsEsports
+        o.kind.isBook && Hermanas.instalada(ctx, Hermanas.PAQ_MARFIL) -> "Leer" to Icons.Rounded.AutoStories
         else -> "Apuntar" to Icons.Rounded.EditNote
     }
     fun primaryAction(o: Ongoing, nav: (Screen) -> Unit) {
-        val g = pcGameOf(o)
         when {
-            g != null -> scope.launch {
-                val err = Stream.play(ctx, g.key)
-                if (err == Stream.FALTA) say("Instala Steam Link para jugar en streaming (Tu PC, en el menú de la portada)") else if (err != null) say(err)
-            }
-            o.kind.isBook && BookFiles.get(ctx, o.play.id) != null -> ReaderActivity.open(ctx, o.play.id, o.play.name)
+            o.kind.isGame && Hermanas.abrir(ctx, Hermanas.PAQ_HIEDRA) -> {}
+            o.kind.isBook && Hermanas.abrir(ctx, Hermanas.PAQ_MARFIL) -> {}
             else -> nav(Screen.Note(o.play, null))
         }
     }
@@ -869,7 +860,7 @@ private fun AppContenido(
             val sec = if (openGo.endsWith("book")) 1 else 0
             section = sec
             when {
-                openGo.startsWith("add") -> { tab = 0; screen = Screen.Search(true) }
+                openGo.startsWith("add") -> { if (sec == 0) Hermanas.abrir(ctx, Hermanas.PAQ_HIEDRA) else Hermanas.abrir(ctx, Hermanas.PAQ_MARFIL) }
                 openGo.startsWith("next") -> { tab = 4; screen = Screen.Home }
                 openGo.startsWith("stats") -> { tab = 3; screen = Screen.Home }
                 else -> screen = Screen.Home
@@ -1062,15 +1053,10 @@ private fun AppContenido(
                         k, if (pv) partner!!.games(k) else gamesOf(k), if (pv) partner!!.plays(k) else playsOf(k), side, pv, segment, { segment = it },
                         onOpenPlay = { openPlay(k, it) },
                         onOpenGame = { screen = if (pv) Screen.PartnerItem(k.id, it.id) else Screen.Edit(it, false) },
-                        onAdd = if (pv) null else ({ forPlay -> screen = Screen.Search(forPlay) }),
+                        // (los juegos se añaden en Hiedra y los libros en Marfil: aquí solo se valoran)
+                        onAdd = if (pv || k.isGame || k.isBook) null else ({ forPlay -> screen = Screen.Search(forPlay) }),
                         onStats = { screen = Screen.Stats },
-                        onDiscover = when {
-                            pv -> null
-                            k.isGame -> ({ screen = Screen.Quiz(0) })
-                            k.isBook -> ({ screen = Screen.Quiz(1) })
-                            cine -> ({ screen = Screen.Quiz(2) })
-                            else -> null
-                        },
+                        onDiscover = null,
                         onWheel = if (pv) null else ({ wheelOpen = true }),
                         sagas = if (!pv) sagas.filter { it.kind == k.id } else null,
                         onOpenSaga = { screen = Screen.Saga(it.id) },
@@ -1084,11 +1070,8 @@ private fun AppContenido(
                 }
 
                 when {
-                    // Escribir: tus obras, el editor y todo lo de escribir (siempre tuyo, no se mezcla con lo de tu pareja)
-                    dest == 5 -> {
-                        SideEffect { EscribirHub.deshacer = { m, u -> undoable(m, u) } }
-                        EscribirScreen(onBack = { go(0) })
-                    }
+                    // Escritos: los capítulos que diste por terminados en Cobalto, para leerlos aquí
+                    dest == 5 -> LecturaCobaltoScreen(onBack = { go(0) })
                     dest == 4 -> {
                         // El Diario: lo de cada día (todo o una categoría); con tu pareja, también lo suyo
                         val dk = if (pv) p!!.kindById(diaryKind) else myKinds.find { it.id == diaryKind } ?: GAMES
@@ -1096,12 +1079,10 @@ private fun AppContenido(
                         val dePareja = p != null && (pv || Mode.calP)
                         val vuelve = rememberResumeTick()
                         var dias by remember { mutableStateOf<List<Dia>?>(null) }
-                        val shots = Suite.localShots
-                        // Al abrirlo, lo último jugado en tus PC (y en los de tu pareja, si es lo suyo)
-                        LaunchedEffect(dePareja, vuelve) {
-                            withContext(Dispatchers.IO) { runCatching { HorasPc.bajar(ctx, store, if (dePareja) store.partnerUid else store.accUid, ya = true) } }
-                        }
-                        LaunchedEffect(dks, games, plays, books, bplays, extra, extraPlays, notas, p, dePareja, syncTick, vuelve, shots, diaryAll, HorasPc.version) {
+                        val shots = emptyList<Shot>()
+                        // Al abrirlo, lo último que han subido las hermanas (lo jugado en Hiedra, lo leído en Marfil, lo escrito en Cobalto)
+                        LaunchedEffect(dePareja, vuelve) { if (!dePareja) Hermanas.pronto(ctx, ya = true) }
+                        LaunchedEffect(dks, games, plays, books, bplays, extra, extraPlays, notas, p, dePareja, syncTick, vuelve, diaryAll, Hermanas.version) {
                             val fichas = dks.map { k -> Triple(k, if (dePareja) p!!.games(k) else gamesOf(k), if (dePareja) p!!.plays(k) else playsOf(k)) }
                             val conLibros = dks.any { it.isBook }
                             val conJuegos = dks.any { it.isGame }
@@ -1112,10 +1093,10 @@ private fun AppContenido(
                                     if (conJuegos) HorasPc.porDia(ctx, store.partnerUid) else emptyMap(), soloDe = solo
                                 ) else FuentesDiario(
                                     fichas, notas,
-                                    if (conLibros) BookFiles.leidoPorDia(ctx, soloSeguidos = true) else emptyMap(),
-                                    if (conJuegos && store.paired) HorasPc.porDia(ctx, store.accUid) else emptyMap(),
-                                    if (conLibros) (books.map { it.id } + bplays.map { it.id }).distinct().associateWith { bookNotes(ctx, it) }.filterValues { it.isNotEmpty() } else emptyMap(),
-                                    if (conJuegos) shots else emptyList(), solo
+                                    if (conLibros) Hermanas.leidoPorDia(ctx) else emptyMap(),
+                                    if (conJuegos) Hermanas.jugadoPorDia(ctx) else emptyMap(),
+                                    emptyMap(), emptyList(), solo,
+                                    palabras = Hermanas.palabras(ctx)
                                 )
                                 diasDelDiario(f)
                             }
@@ -1150,7 +1131,7 @@ private fun AppContenido(
                             },
                             acc = DiarioAcciones(
                                 abrir = { t -> if (t.id != 0L) abrirFicha(t.kind, t.id) },
-                                cita = { t, n -> ReaderActivity.open(ctx, t.id, t.nombre, n.value) },
+                                cita = { _, _ -> Hermanas.abrir(ctx, Hermanas.PAQ_MARFIL) },
                                 captura = { s -> screen = Screen.ShotView(s, screen) },
                                 escribir = { d, n -> escribiendo = Triple(d, n, emptyList()) },
                                 apuntar = { k, pl -> section = k.id; memoFor = pl to null },
@@ -1186,19 +1167,13 @@ private fun AppContenido(
                                 library = { k -> if (k.isMovie || k.isTv) cineTv = k.isTv; section = k.id; segment = 0; shellLib = true },
                                 diary = { go(4) },
                                 write = if (pv) null else ({ go(5) }),
-                                discover = if (pv) null else ({ d ->
-                                    when (d) {
-                                        0 -> { section = 0; screen = Screen.Quiz(0) }
-                                        1 -> { section = 1; screen = Screen.Quiz(1) }
-                                        else -> { section = cineKindId(); screen = Screen.Quiz(2) }
-                                    }
-                                }),
+                                discover = null,
                                 profile = if (pv) null else ({ screen = Screen.Profile }),
-                                add = if (pv) null else ({ k -> section = k.id; screen = Screen.Search(true) }),
+                                add = if (pv) null else ({ k -> if (k.isGame) Hermanas.abrir(ctx, Hermanas.PAQ_HIEDRA) else if (k.isBook) Hermanas.abrir(ctx, Hermanas.PAQ_MARFIL) else { section = k.id; screen = Screen.Search(true) } }),
                                 partner = if (p != null) ({ togglePartner() }) else null,
                                 // (desde la portada, al salir de Estadísticas se vuelve a la portada, no a la biblioteca)
                                 stats = { k -> section = k.id; shellLib = false; screen = Screen.Stats },
-                                pc = if (pv) null else ({ screen = Screen.Suite }),
+                                pc = null,
                                 pickImage = if (pv) null else ({ o ->
                                     val pl = o.play
                                     section = o.kind.id
@@ -1213,7 +1188,7 @@ private fun AppContenido(
             } else {
             when (s) {
                 Screen.Stats -> StatsScreen(
-                    kind, myGames, myPlays, side,
+                    kind, myGames.filter { !Hermanas.sinValorar(it) }, myPlays, side,
                     when {
                         kind.custom -> 0
                         pv -> if (kind.isBook) (partner?.goalBooks ?: 0) else (partner?.goalGames ?: 0)
@@ -1250,9 +1225,9 @@ private fun AppContenido(
                     store, partner,
                     onStyle = { Skin.open = true },
                     onSettings = { screen = Screen.Settings },
-                    onSuite = { screen = Screen.Suite },
+                    onSuite = {},
                     onMassScores = { screen = Screen.MassScore(Screen.Profile) },
-                    onDuelos = { screen = Screen.Duelos(Screen.Profile) },
+                    onDuelos = {},
                     onNegraAnadir = { n -> store.addNegra(n); reloadAll(); say("«$n» a la lista negra: ya no saldrá en ningún sitio") },
                     onNegraQuitar = { v -> store.removeNegra(v); say("«${v.nombre}» ya puede volver a salir") },
                     onPedirAvisos = {
@@ -1319,9 +1294,6 @@ private fun AppContenido(
                     }) else null,
                     importMsg = importMsg,
                     onMassScores = { screen = Screen.MassScore(Screen.Settings) },
-                    onDuelos = { screen = Screen.Duelos(Screen.Settings) },
-                    onGoodreads = { if (importing) say("Ya hay una importación en marcha") else goodreads.launch(arrayOf("text/csv", "text/comma-separated-values", "text/plain", "application/octet-stream", "*/*")) },
-                    onBookmory = { if (importing) say("Ya hay una importación en marcha") else bookmory.launch(arrayOf("application/zip", "application/x-zip-compressed", "text/plain", "application/octet-stream", "*/*")) },
                     steamKey = store.steamKey, steamUser = store.steamUser,
                     onSteam = { k, u -> steamHours(k, u) },
                     pestanas = { PestanasAjustes(1) { screen = it } }
@@ -1447,7 +1419,7 @@ private fun AppContenido(
                     onExport = { g, m -> export(g, m) },
                     onRecommend = if (side != null && !kind.custom) ({ g, note -> recommend(kind, g.id, g.name, g.cover, g.creator, note) }) else null,
                     editing = s.editing,
-                    findTtb = if (kind.isGame) ({ n -> TimeToBeat.find(n, store) }) else null,
+                    findTtb = null,
                     onQuiet = { g -> if (gamesOf(kind).any { it.id == g.id }) setGames(kind, gamesOf(kind).map { if (it.id == g.id) g else it }) }
                 ) { atras() } }
 
@@ -1497,7 +1469,7 @@ private fun AppContenido(
                         },
                         onRecommend = if (side != null && !kind.custom) ({ p, note -> recommend(kind, p.id, p.name, p.cover, p.creator, note) }) else null,
                         onDelete = { p -> deletePlay(p); screen = Screen.Home },
-                        findTtb = { n -> TimeToBeat.find(n, store) },
+                        findTtb = null,
                         findEpisodes = if (kind.isTv) ({ id, name -> TvMaze.episodes(id, name) }) else null,
                         onMemo = { p -> memoFor = p to null },
                         onDeleteMemo = { p, m -> deleteMemo(p, m) },
@@ -1647,14 +1619,7 @@ private fun AppContenido(
             )
         }
 
-        val gs = guideSheet
-        if (gs != null) {
-            PcGameSheet(gs, Suite.target() != null, onDismiss = { guideSheet = null }, say = { say(it) })
-        }
-        if (shareUrl.isNotEmpty()) {
-            if (!store.paired) { LaunchedEffect(shareUrl) { say("Para guardar webs en tus juegos del PC, entra antes en tu cuenta"); onShareHandled() } }
-            else ShareToGameDialog(shareUrl, shareTitle, onDismiss = { onShareHandled() }, say = { say(it) })
-        }
+        if (shareUrl.isNotEmpty()) LaunchedEffect(shareUrl) { onShareHandled() }
         webPick?.let { (q, cb) ->
             InternetPicker(q, onPick = { url -> webPick = null; cb(url); NubeSync.enqueue(ctx) }, onDismiss = { webPick = null })
         }
@@ -1675,7 +1640,7 @@ private fun AppContenido(
             }
             // Primero lo de ese día (lo que terminaste, empezaste, apuntaste o leíste) y lo que llevas entre manos
             val propuestas = remember(dia, todas) {
-                val leidoEse = BookFiles.leidoPorDia(ctx, soloSeguidos = true)[dia].orEmpty().filterValues { it >= 60_000L }.keys
+                val leidoEse = Hermanas.leidoPorDia(ctx)[dia].orEmpty().filterValues { it >= 60_000L }.keys
                 val ese = myKinds.flatMap { k ->
                     playsOf(k).filter { pl -> pl.start == dia || pl.end == dia || pl.liveMemos.any { diaDe(it.t) == dia } || pl.entries.any { diaDe(it.time) == dia } || (k.isBook && pl.id in leidoEse) }.map { refDe(k.id, it.id) } +
                         gamesOf(k).filter { g -> g.end == dia || g.start == dia || (k.isBook && g.id in leidoEse) }.map { refDe(k.id, it.id) }
@@ -1712,8 +1677,8 @@ private fun AppContenido(
         Actualizador.nueva?.takeIf { !it.silenciosa && !luego }?.let { n ->
             androidx.compose.material3.AlertDialog(
                 onDismissRequest = { luego = true },
-                title = { Text("Atrio ${n.nombre.removePrefix("Atrio-").removeSuffix(".apk")}", fontFamily = Display) },
-                text = { Text(if (Actualizador.faltaPermiso) "Hay una versión nueva en tu kDrive. Para instalarla, Android tiene que dejar a Atrio instalar apps: te llevo a ese ajuste." else "Hay una versión nueva en tu kDrive, ya descargada. Android te pedirá confirmar la instalación.") },
+                title = { Text("Azabache ${n.nombre.removePrefix("Azabache-").removeSuffix(".apk")}", fontFamily = Display) },
+                text = { Text(if (Actualizador.faltaPermiso) "Hay una versión nueva en tu kDrive. Para instalarla, Android tiene que dejar a Azabache instalar apps: te llevo a ese ajuste." else "Hay una versión nueva en tu kDrive, ya descargada. Android te pedirá confirmar la instalación.") },
                 confirmButton = { androidx.compose.material3.TextButton({
                     luego = true
                     if (Actualizador.faltaPermiso) { Actualizador.faltaPermiso = false; ctx.startActivity(android.content.Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, android.net.Uri.parse("package:${ctx.packageName}"))) }
@@ -1726,7 +1691,7 @@ private fun AppContenido(
         val mf = memoFor
         if (mf != null) {
             MemoDialog(
-                "Apunte · ${mf.first.name}", canShot = kind.isGame && Suite.target() != null, presetShot = mf.second,
+                "Apunte · ${mf.first.name}", canShot = false, presetShot = mf.second,
                 onSave = { t, w -> memoFor = null; saveMemo(mf.first, t, w, mf.second) },
                 onDismiss = { memoFor = null }
             )

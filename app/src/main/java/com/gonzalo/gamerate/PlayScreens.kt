@@ -103,12 +103,10 @@ fun PlayDetailScreen(
             if (designing) DesignHint(onData = { designing = false; editing = true }, name = p.name, onDelete = { onDelete(p) }, onArt = { hero -> onArt(p, hero) }, hasHero = kind.admiteFondo)
 
             val defs = linkedMapOf<String, MagDef>()
-            if (kind.isGame) defs["guias"] = MagDef("Guías") { GuidesSection(p.id, p.name, inCell = true) }
             if (kind.isMovie || kind.isTv) defs["critica"] = MagDef("Crítica") { MagCritics(kind, p.id, p.name) }
             if (kind.isMovie || kind.isTv) defs["donde"] = MagDef("Dónde verla") { MagDonde(kind, p.id, p.name) }
-            if (kind.isBook) defs["lectura"] = MagDef("Lectura") { BookFileBar(p.id, p.name) }
-            if (kind.isBook) defs["subrayados"] = MagDef("Subrayados y notas") { BookNotesBox(p.id, p.name) }
-            if (kind.isBook) defs["capitulos"] = MagDef("Capítulos") {
+            if (kind.isBook) defs["lectura"] = MagDef("Lectura") { LecturaMarfil(p.id, p.name, p.pages, p.minutes) }
+            if (false) defs["capitulos"] = MagDef("Capítulos") {
                 if (p.status == 1) {
                     Text(if (p.chapter > 0) "${p.chapter}" else "—", fontFamily = Display, fontWeight = FontWeight.Bold, fontSize = 56.sp, lineHeight = 56.sp)
                     Text("CAPÍTULO ACTUAL", color = Muted, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
@@ -139,15 +137,10 @@ fun PlayDetailScreen(
                 MagLink("Apuntar", if (b != null) "media de ${p.entries.size} apuntes" else null, accent = due) { onNote(p, null) }
                 MagLink(if (b != null) "Pasar a valorados" else "Terminar y valorar") { onFinish(p) }
             }
-            val hasPc = remember(p.id, p.name, Suite.libs) { Guides.pcGameFor(p.id, p.name) != null }
-            if (kind.isGame && hasPc) defs["jugar"] = MagDef("Jugar") { FichaPlayButtons(p.id, p.name) }
-            if (!kind.isBook) defs["progreso"] = MagDef(null) {
+            if (kind.isGame) defs["jugar"] = MagDef("Jugar") { JugarHiedra(p.name) }
+            if (kind.isMovie || kind.isTv) defs["progreso"] = MagDef(null) {
                 val fe = findEpisodes
-                if (kind.isGame) ProgressPanel(p, kind, readOnly = true, find = findTtb) { upd(it) }
-                else ProgressPanel(p, kind, readOnly = true, episodes = if (fe != null) ({ fe(p.id, p.name) }) else null) { upd(it) }
-            }
-            defs["partes"] = MagDef(null) {
-                PlaySuitePanel(p, kind, onMemo = { onMemo(p) }, onDeleteMemo = { onDeleteMemo(p, it) }, onOpenShot = onOpenShot)
+                ProgressPanel(p, kind, readOnly = true, episodes = if (fe != null) ({ fe(p.id, p.name) }) else null) { upd(it) }
             }
             defs["apuntes"] = MagDef("Apuntes", "Nuevo" to { onNote(p, null) }) {
                 if (p.entries.isEmpty()) Text("Aún no has apuntado nada.", color = Muted, fontFamily = Display, fontStyle = androidx.compose.ui.text.font.FontStyle.Italic, fontSize = 15.sp)
@@ -162,7 +155,7 @@ fun PlayDetailScreen(
                     }
                 }
             }
-            if (kind.isGame) defs["horas"] = MagDef("Horas") { MagHours(p.minutes, p.ttbMain, p.ttbExtra, p.ttbFull) }
+            if (kind.isGame) defs["horas"] = MagDef("Horas") { MagHours(p.minutes, p.ttbMain, p.ttbExtra, p.ttbFull, "") }
             // Lo que has escrito de esto en tu diario (solo si hay algo)
             if (!Mode.viewP && DiarioHub.de(kind.id, p.id).isNotEmpty()) defs["diario"] = MagDef("En tu diario", "Escribir" to { DiarioHub.escribirSobre?.invoke(kind, p.id) }) { DiarioDeFicha(kind, p.id) }
             defs["enlaces"] = MagDef("Enlaces") {
@@ -174,10 +167,10 @@ fun PlayDetailScreen(
                 MagLink("Datos de la ficha") { editing = true }
             }
             val defaults = when {
-                kind.isGame -> magRows(listOf("guias", "estado"), listOf("jugar"), listOf("progreso"), listOf("partes"), listOf("apuntes"), listOf("diario"), listOf("horas", "enlaces"))
-                kind.isMovie || kind.isTv -> magRows(listOf("critica", "estado"), listOf("donde"), listOf("progreso"), listOf("partes"), listOf("apuntes"), listOf("diario"), listOf("enlaces"))
-                kind.isBook -> magRows(listOf("lectura"), listOf("capitulos", "estado"), listOf("subrayados"), listOf("partes"), listOf("apuntes"), listOf("diario"), listOf("enlaces"))
-                else -> magRows(listOf("estado"), listOf("progreso"), listOf("partes"), listOf("apuntes"), listOf("diario"), listOf("enlaces"))
+                kind.isGame -> magRows(listOf("estado"), listOf("jugar"), listOf("apuntes"), listOf("diario"), listOf("horas", "enlaces"))
+                kind.isMovie || kind.isTv -> magRows(listOf("critica", "estado"), listOf("donde"), listOf("progreso"), listOf("apuntes"), listOf("diario"), listOf("enlaces"))
+                kind.isBook -> magRows(listOf("lectura", "estado"), listOf("apuntes"), listOf("diario"), listOf("enlaces"))
+                else -> magRows(listOf("estado"), listOf("apuntes"), listOf("diario"), listOf("enlaces"))
             }
             MagPage("p:${kind.id}:${p.id}", "tpl:p:${kind.id}", kind.title, defaults, defs, kind, p.id, p.name, designing)
             if (designing) MagFooter("Listo") { designing = false } else MagFooter { designing = true }

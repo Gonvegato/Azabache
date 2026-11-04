@@ -342,11 +342,6 @@ private fun ColumnScope.ReadCard(
             Spacer(Modifier.height(6.dp))
             Text(g.review, fontSize = 16.sp, lineHeight = 24.sp, modifier = Modifier.align(Alignment.Start))
         }
-        if (kind.isGame) {
-            Spacer(Modifier.height(22.dp))
-            FichaPlayButtons(g.id, g.name, Modifier.padding(bottom = 16.dp))
-            GuidesSection(g.id, g.name)
-        }
         if (kind.hasSoundtrack) {
             Spacer(Modifier.height(20.dp))
             SoundtrackButton(g.name)

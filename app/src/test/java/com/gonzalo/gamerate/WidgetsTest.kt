@@ -205,10 +205,9 @@ class WidgetsTest {
         val rejilla = p.zonas.first { it.celdas != null }.celdas!!
         assertTrue(rejilla.size in 4..6 && rejilla.all { it.size == 7 })
         Widgets.accion(ctx, 3, "hoy")
-        // Leyendo: el libro con archivo se abre en el lector
+        // Leyendo: sin Marfil en el móvil, el libro abre su ficha aquí (el lector es de Marfil)
         val pi = Widgets.componer(ctx, WTipo.LEYENDO, 4, 330f, 165f).zonas.first().toque!!
         val i = org.robolectric.Shadows.shadowOf(pi).savedIntent
-        assertEquals(ReaderActivity::class.java.name, i.component?.className)
-        assertEquals(301L, i.getLongExtra("id", 0L))
+        assertEquals(MainActivity::class.java.name, i.component?.className)
     }
 }

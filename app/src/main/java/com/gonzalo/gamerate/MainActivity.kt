@@ -86,17 +86,6 @@ class MainActivity : ComponentActivity() {
         openId = i?.getLongExtra("play_id", 0L) ?: 0L
         openPartner = i?.getBooleanExtra("partner", false) ?: false
         openGo = i?.getStringExtra("go") ?: ""
-        // Atajo del icono «Seguir leyendo»: directo al lector, en tu página
-        i?.getLongExtra("leer", 0L)?.takeIf { it != 0L }?.let { id ->
-            i.removeExtra("leer")
-            ReaderActivity.open(this, id, i.getStringExtra("leer_nombre") ?: "")
-        }
-        // Compartir → Atrio desde el navegador: una web para guardarla como guía de un juego del PC
-        if (i?.action == Intent.ACTION_SEND) {
-            val txt = i.getStringExtra(Intent.EXTRA_TEXT) ?: ""
-            val url = Regex("https?://\\S+").find(txt)?.value ?: ""
-            if (url.isNotEmpty()) { shareUrl = url; shareTitle = (i.getStringExtra(Intent.EXTRA_SUBJECT) ?: txt.replace(url, "")).trim() }
-        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

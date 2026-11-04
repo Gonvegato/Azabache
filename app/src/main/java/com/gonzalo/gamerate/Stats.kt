@@ -492,7 +492,7 @@ fun StatsScreen(
 private fun TiempoLeyendoSection(year: Int?, games: List<Game>, plays: List<Play>) {
     val ctx = androidx.compose.ui.platform.LocalContext.current
     val vuelve = rememberResumeTick()
-    val t = remember(year, vuelve) { tiempoLeyendo(BookFiles.leidoPorDia(ctx), year) }
+    val t = remember(year, vuelve) { tiempoLeyendo(Hermanas.leidoPorDia(ctx), year) }
     if (t.total < 60_000L) return
     Section("Tiempo leyendo") {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

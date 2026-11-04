@@ -370,17 +370,16 @@ fun SettingsScreen(
         }
 
         SettingsSection("Servicios", 380) {
-            Text("RAWG (estudios y recomendaciones de juegos)", fontWeight = FontWeight.SemiBold)
-            Plegado(
-                "Con una clave gratuita de rawg.io/apidocs, «Descubrir» te propone juegos según tus respuestas y se detectan mejor los estudios. " +
-                    "Sin ella, los estudios se buscan en Wikidata y Descubrir solo funciona con libros, pelis y series."
-            )
+            Text("Las claves de aquí (SteamGridDB, Steam, RAWG, IGDB) viajan con tu cuenta: Hiedra y Marfil las usan sin pegarlas otra vez.", color = UiSoft, fontSize = 13.sp)
+            Spacer(Modifier.height(10.dp))
+            Text("RAWG (datos de los juegos, en Hiedra)", fontWeight = FontWeight.SemiBold)
+            Plegado("Con una clave gratuita de rawg.io/apidocs, Hiedra saca de RAWG la fecha, el estudio y los géneros de los juegos de consola; aquí se detectan mejor los estudios.")
             OutlinedTextField(rk, { rk = it }, label = { Text("Clave de RAWG") }, singleLine = true,
                 shape = shp(14.dp), modifier = Modifier.fillMaxWidth())
             Spacer(Modifier.height(12.dp))
-            Text("IGDB (cuánto dura cada juego)", fontWeight = FontWeight.SemiBold)
+            Text("IGDB (cuánto dura cada juego, en Hiedra)", fontWeight = FontWeight.SemiBold)
             Plegado(
-                "Da el tiempo que tardan sus jugadores en pasarse cada juego: deprisa, normal y al 100 %. Es gratis y va con una cuenta de Twitch " +
+                "Da el tiempo que tardan sus jugadores en pasarse cada juego: deprisa, normal y al 100 %. Hiedra se lo pone a cada juego. Es gratis y va con una cuenta de Twitch " +
                     "(con verificación en dos pasos): en dev.twitch.tv/console registra una aplicación con cualquier nombre, " +
                     "URL de redirección «http://localhost», categoría «Application Integration» y tipo «Confidencial». Copia aquí su Client ID y un secreto nuevo. " +
                     "Sin esto se usa la media de horas de RAWG, o la pones a mano."
@@ -411,30 +410,10 @@ fun SettingsScreen(
             if (studioMsg.isNotEmpty()) Text(studioMsg, color = UiSoft, fontSize = 13.sp, modifier = Modifier.padding(top = 6.dp))
         }
 
-        SettingsSection("Traer de otras apps", 390) {
-            Text("Goodreads", fontWeight = FontWeight.SemiBold)
-            Plegado(
-                "En goodreads.com: Mis libros → Importar y exportar → Exportar biblioteca. Descarga el CSV y elígelo aquí. " +
-                    "Los leídos pasan a valorados (cada estrella son 20 puntos), los que estás leyendo a Leyendo y el resto a En lista. " +
-                    "Lo que ya tengas no se duplica."
-            )
-            OutlinedButton(onGoodreads, shape = pillShape()) { Text("Importar CSV de Goodreads") }
-            if (importMsg.isNotEmpty() && "Steam" !in importMsg && "Bookmory" !in importMsg) ImportNote(importMsg)
-            Spacer(Modifier.height(14.dp))
-            Text("Bookmory", fontWeight = FontWeight.SemiBold)
-            Plegado(
-                "Exporta tus datos desde Bookmory (un .zip con un .txt por libro) y elige aquí ese .zip tal cual. " +
-                    "Los terminados pasan a Leídos con tu nota (cada estrella son 20 puntos), tus fechas, favoritos, comentarios, relecturas y citas; " +
-                    "los que estás leyendo o tienes en pausa, a Leyendo, y los de leer más tarde, a En lista. " +
-                    "Lo que ya tengas no se duplica: solo se completa lo que le falte, sin tocar tus notas. Se puede deshacer en Copia de seguridad."
-            )
-            OutlinedButton(onBookmory, shape = pillShape()) { Text("Importar ZIP de Bookmory") }
-            if (importMsg.isNotEmpty() && "Bookmory" in importMsg) ImportNote(importMsg)
-            Spacer(Modifier.height(14.dp))
+        SettingsSection("Steam", 390) {
             Text("Horas de Steam", fontWeight = FontWeight.SemiBold)
             Plegado(
-                "Copia las horas jugadas de tu biblioteca de Steam en todos tus juegos, también los valorados (solo si Steam tiene más). " +
-                    "Una vez guardado, se actualiza solo al abrir la app. " +
+                "La clave y el perfil de Steam los usa Hiedra para traer tus horas (viajan con tu cuenta). Aquí también se copian en tus juegos, solo si Steam tiene más. " +
                     "Necesitas una clave en steamcommunity.com/dev/apikey y que los detalles de juego de tu perfil sean públicos."
             )
             OutlinedTextField(sk, { sk = it }, label = { Text("Clave de Steam") }, singleLine = true,

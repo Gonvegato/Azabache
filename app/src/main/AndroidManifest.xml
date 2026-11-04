@@ -44,12 +44,6 @@
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustResize"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|keyboard|uiMode|density">
-            <!-- Compartir → Atrio: una web (guía, build…) para guardarla en un juego del PC -->
-            <intent-filter android:label="Guardar como guía en Atrio">
-                <action android:name="android.intent.action.SEND" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="text/plain" />
-            </intent-filter>
         </activity>
         <!-- Los colores de Atrio (solo colores), para que Pórtico, la otra app, se vea con los tuyos -->
         <provider android:name=".TemaProvider" android:authorities="com.gonzalo.gamerate.tema" android:exported="true" />

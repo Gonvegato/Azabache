@@ -84,8 +84,8 @@ class Toque(
 }
 
 /** Un día del diario: lo escrito y lo hecho. */
-class Dia(val dia: Long, val notas: List<Nota>, val toques: List<Toque>) {
-    val vacio: Boolean get() = notas.isEmpty() && toques.isEmpty()
+class Dia(val dia: Long, val notas: List<Nota>, val toques: List<Toque>, val palabras: Int = 0) {
+    val vacio: Boolean get() = notas.isEmpty() && toques.isEmpty() && palabras <= 0
     val leidoMs: Long get() = toques.sumOf { it.leidoMs }
     val jugadoMs: Long get() = toques.sumOf { it.jugadoMs }
     val terminados: List<Toque> get() = toques.filter { it.terminado }
@@ -106,7 +106,9 @@ class FuentesDiario(
     val citas: Map<Long, List<BookNote>> = emptyMap(),
     val capturas: List<Shot> = emptyList(),
     /** Solo lo escrito sobre estas categorías (null: también lo que no habla de ninguna ficha). */
-    val soloDe: Set<Int>? = null
+    val soloDe: Set<Int>? = null,
+    /** Las palabras escritas cada día (Cobalto). */
+    val palabras: Map<Long, Int> = emptyMap()
 )
 
 /** Los días con algo, del más nuevo al más viejo. */
@@ -116,7 +118,7 @@ fun diasDelDiario(f0: FuentesDiario, zona: ZoneId = ZoneId.systemDefault()): Lis
         f0.fichas.map { (k, gs, ps) -> if (k.isGame) Triple(k, gs.filterNot { Negra.vetado(it.name) }, ps.filterNot { Negra.vetado(it.name) }) else Triple(k, gs, ps) },
         f0.notas, f0.leido,
         f0.jugado.mapValues { (_, m) -> m.filterKeys { !Negra.vetado(it.nombre) } },
-        f0.citas, f0.capturas.filterNot { Negra.vetado(it.game) }, f0.soloDe
+        f0.citas, f0.capturas.filterNot { Negra.vetado(it.game) }, f0.soloDe, f0.palabras
     )
     val porDia = HashMap<Long, LinkedHashMap<String, Toque>>()
     // Cada ficha, por categoría e id (la de «en curso» si la hay: es la que tiene apuntes)
@@ -181,22 +183,24 @@ fun diasDelDiario(f0: FuentesDiario, zona: ZoneId = ZoneId.systemDefault()): Lis
         val s = f.soloDe ?: return@filter true
         n.sobre.any { r -> r.substringBefore(':').toIntOrNull() in s }
     }.groupBy { it.dia }
-    val dias = (porDia.keys + notas.keys).distinct().sortedDescending()
+    val conPalabras = if (f.soloDe == null) f.palabras.filterValues { it > 0 } else emptyMap()
+    val dias = (porDia.keys + notas.keys + conPalabras.keys).distinct().sortedDescending()
     return dias.map { d ->
         val ts = porDia[d]?.values.orEmpty().sortedWith(
             compareByDescending<Toque> { it.terminado }.thenByDescending { it.jugadoMs + it.leidoMs }.thenByDescending { it.t }
         )
-        Dia(d, notas[d].orEmpty().sortedBy { it.id }, ts)
+        Dia(d, notas[d].orEmpty().sortedBy { it.id }, ts, conPalabras[d] ?: 0)
     }.filter { !it.vacio }
 }
 
 /** Lo de un mes (o cualquier tramo de días): terminados, lo leído y jugado, lo escrito y los días con algo. */
-class ResumenDiario(val terminados: Int, val leidoMs: Long, val jugadoMs: Long, val entradas: Int, val dias: Int) {
+class ResumenDiario(val terminados: Int, val leidoMs: Long, val jugadoMs: Long, val entradas: Int, val dias: Int, val palabras: Int = 0) {
     fun texto(): String {
         val p = ArrayList<String>()
         if (terminados > 0) p += "$terminados terminado${if (terminados == 1) "" else "s"}"
         if (leidoMs >= 60_000L) p += "${readTime((leidoMs + 30_000L) / 60_000L)} leyendo"
         if (jugadoMs >= 60_000L) p += "${readTime((jugadoMs + 30_000L) / 60_000L)} jugando"
+        if (palabras > 0) p += "${cifraE(palabras)} palabras"
         if (entradas > 0) p += "$entradas entrada${if (entradas == 1) "" else "s"}"
         return p.joinToString(" · ")
     }
@@ -204,7 +208,7 @@ class ResumenDiario(val terminados: Int, val leidoMs: Long, val jugadoMs: Long, 
 
 fun resumenDiario(dias: List<Dia>, desde: Long, hasta: Long): ResumenDiario {
     val ds = dias.filter { it.dia in desde..hasta }
-    return ResumenDiario(ds.sumOf { it.terminados.size }, ds.sumOf { it.leidoMs }, ds.sumOf { it.jugadoMs }, ds.sumOf { it.notas.size }, ds.size)
+    return ResumenDiario(ds.sumOf { it.terminados.size }, ds.sumOf { it.leidoMs }, ds.sumOf { it.jugadoMs }, ds.sumOf { it.notas.size }, ds.size, ds.sumOf { it.palabras })
 }
 
 /** Días seguidos con algo en el diario, contando hoy (o desde ayer, si hoy aún no hay nada). */

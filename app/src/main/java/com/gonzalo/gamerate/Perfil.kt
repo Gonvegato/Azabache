@@ -117,14 +117,6 @@ fun ProfileScreen(
             Spacer(Modifier.height(12.dp))
         }
 
-        // Tu PC
-        val pc = Suite.target()
-        ProfileRow(Icons.Rounded.DesktopWindows, "Tu PC", when {
-            !store.paired -> "Entra en tu cuenta para conectarlo"
-            pc != null -> "${pc.name} · conectado"
-            else -> "Desconectado · streaming, encendido y capturas"
-        }, Modifier.rise(2), onSuite)
-        Spacer(Modifier.height(12.dp))
 
         // Objetivos
         Card6(Modifier.rise(3)) {
@@ -226,7 +218,7 @@ fun ProfileScreen(
         if (negra) NegraDialogo(onAnadir = { n -> onNegraAnadir(n) }, onQuitar = { v -> onNegraQuitar(v) }, onCerrar = { negra = false })
         // Repasar notas (sobre todo tras importar): por duelos o una a una
         var repasar by remember { mutableStateOf(false) }
-        ProfileRow(Icons.Rounded.Edit, "Repasar notas", "Duelos de libros o cambiar varias notas seguidas (p. ej. tras importar)", Modifier.rise(5)) { repasar = true }
+        ProfileRow(Icons.Rounded.Edit, "Repasar notas", "Cambiar varias notas seguidas", Modifier.rise(5), onMassScores)
         Spacer(Modifier.height(12.dp))
         if (repasar) androidx.compose.material3.AlertDialog(
             onDismissRequest = { repasar = false },

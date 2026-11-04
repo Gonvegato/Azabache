@@ -73,7 +73,7 @@ fun RevistaCita(books: List<ShellEntry>) {
         Text("«", color = ColGeneral, fontFamily = Display, fontWeight = FontWeight.Bold, fontSize = 64.sp, lineHeight = 44.sp)
         Text(
             c.note.text, fontFamily = Display, fontStyle = FontStyle.Italic, fontSize = 24.sp, lineHeight = 32.sp,
-            modifier = Modifier.clickable { ReaderActivity.open(ctx, c.bookId, c.bookName, c.note.value) }
+            modifier = Modifier.clickable { Hermanas.abrir(ctx, Hermanas.PAQ_MARFIL) }
         )
         if (c.note.note.isNotBlank()) Text(c.note.note, color = ColGeneral, fontSize = 14.sp, lineHeight = 19.sp, modifier = Modifier.padding(top = 8.dp))
         Text(
@@ -282,12 +282,12 @@ fun NumeroEspecial(name: String, kinds: List<Kind>, entries: (Kind) -> List<Shel
                 EsSection("Lo que subrayaste")
                 quotes.shuffled(kotlin.random.Random(year)).take(3).forEach { c ->
                     Text("«${c.note.text}»", fontFamily = Display, fontStyle = FontStyle.Italic, fontSize = 19.sp, lineHeight = 26.sp,
-                        modifier = Modifier.padding(top = 6.dp).clickable { ReaderActivity.open(ctx, c.bookId, c.bookName, c.note.value) })
+                        modifier = Modifier.padding(top = 6.dp).clickable { Hermanas.abrir(ctx, Hermanas.PAQ_MARFIL) })
                     Text("— ${c.bookName}".uppercase(), color = Muted, fontSize = 10.sp, fontWeight = FontWeight.Black, letterSpacing = 1.2.sp, modifier = Modifier.padding(top = 4.dp, bottom = 12.dp))
                 }
             }
             Spacer(Modifier.height(30.dp))
-            Text("Atrio · número especial · $year", color = Muted, fontFamily = Display, fontStyle = FontStyle.Italic, fontSize = 13.sp, modifier = Modifier.align(Alignment.CenterHorizontally))
+            Text("Azabache · número especial · $year", color = Muted, fontFamily = Display, fontStyle = FontStyle.Italic, fontSize = 13.sp, modifier = Modifier.align(Alignment.CenterHorizontally))
             Spacer(Modifier.height(28.dp))
         }
     }
