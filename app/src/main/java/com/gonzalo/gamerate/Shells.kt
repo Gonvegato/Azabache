@@ -448,7 +448,7 @@ private fun BuscadorGeneral(m: ShellModel, onClose: () -> Unit) {
     val todo = remember(m.kinds) { m.kinds.flatMap { k -> m.entries(k) } }
     val libros = remember(todo) { todo.filter { it.kind.isBook }.distinctBy { it.id } }
     // Las citas de tus libros (con el lector), para buscar también en ellas
-    val citas = remember(libros) { libros.flatMap { e -> bookNotes(ctx, e.id).map { e to it } } }
+    val citas = remember(libros, Hermanas.version) { libros.flatMap { e -> bookNotes(ctx, e.id).map { e to it } } }
     val res = remember(q, todo) { if (q.isBlank()) emptyList() else todo.filter { libMatches(q, it.name, it.creator) }.sortedByDescending { it.activity }.take(80) }
     val resCitas = remember(q, citas) { if (q.trim().length < 3) emptyList() else citas.filter { (_, n) -> libMatches(q, n.text, n.note) }.take(40) }
     // Y en lo que has escrito en tu diario

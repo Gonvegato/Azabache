@@ -375,6 +375,38 @@ object Hermanas {
         return diasLibros(lee(c, "tiempo_marfil"), enl.entries.associate { (k, v) -> kidDe(k) to v })
     }
     fun palabras(c: Context): Map<Long, Int> = palabrasPorDia(lee(c, "palabras_cobalto"))
+    /** Los subrayados de Marfil, por ficha de aquí (solo los libros que tienen ficha). */
+    fun subrayados(c: Context): Map<Long, List<BookNote>> {
+        val enl = enlaces(c, "marfil")
+        return subrayadosDe(lee(c, "subrayados_marfil"), enl.entries.associate { (k, v) -> kidDe(k) to v })
+    }
+
+    /**
+     * `subrayados/<kid>/<escritor>` = {t, a, n: [{x, o, c, l, k}]}: cada escritor trae los de todos los dispositivos, así que se unen por
+     * sitio (`k`) y hora (`c`). Salen como notas de aquí (el sitio es el «value», para abrir el libro ahí en Marfil).
+     */
+    fun subrayadosDe(sub: JSONObject?, enlacesPorKid: Map<String, Long>): Map<Long, List<BookNote>> {
+        sub ?: return emptyMap()
+        val out = HashMap<Long, LinkedHashMap<String, BookNote>>()
+        for (kid in sub.keys()) {
+            val id = enlacesPorKid[kid] ?: continue
+            val escritores = sub.optJSONObject(kid) ?: continue
+            for (w in escritores.keys()) {
+                val n = escritores.optJSONObject(w)?.optJSONArray("n") ?: continue
+                for (i in 0 until n.length()) {
+                    val o = n.optJSONObject(i) ?: continue
+                    val x = o.optString("x").trim(); if (x.isBlank()) continue
+                    val k = o.optString("k"); val creado = o.optLong("c")
+                    val m = out.getOrPut(id) { LinkedHashMap() }
+                    val nuevo = BookNote(k, x, o.optString("o"), o.optString("l"), creado, 0)
+                    // Entre escritores, el mismo subrayado: se queda el que lleva nota (un escritor puede ir por detrás del otro)
+                    val previo = m["$k@$creado"]
+                    if (previo == null || (previo.note.isBlank() && nuevo.note.isNotBlank())) m["$k@$creado"] = nuevo
+                }
+            }
+        }
+        return out.mapValues { (_, m) -> m.values.sortedBy { it.created } }
+    }
     fun capitulos(c: Context): List<Capitulo> = capitulosDe(lee(c, "lectura_cobalto"))
     fun ultimaVez(c: Context) = prefs(c).getLong("ultima", 0L)
 
@@ -455,6 +487,9 @@ object Hermanas {
                 val e = reflejarLibros(libros, store.load(BOOKS.id), store.loadPlays(BOOKS.id), enl, { l -> portadaLibro(c, l, portadas) }, pu, ahora)
                 if (e.cambio) { store.save(e.games, BOOKS.id); store.savePlays(e.plays, BOOKS.id); guardaEnlaces(c, "marfil", enl); guardaPuestas(c, "marfil", pu); cambio = true }
                 nodo("marfil/tiempo")?.let { guarda(c, "tiempo_marfil", it.toString()); cambio = true }
+                // Los subrayados (ligeros): la cita de la portada, el Diario, el buscador y el widget
+                val sub = nodo("marfil/subrayados")?.toString() ?: "{}"
+                if (sub != prefs(c).getString("subrayados_marfil", "")) { guarda(c, "subrayados_marfil", sub); cambio = true }
             }
         }
         // Cobalto

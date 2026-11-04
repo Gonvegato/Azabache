@@ -16,6 +16,7 @@ refleja en sus propias listas, donde se valoran. Los contratos de cada una está
 | Hiedra | `nube/portadas/<id>` | La portada que pusiste tú de la galería (se baja de kDrive si Azabache tiene tu token). Si no hay, la dirección que viaja en la biblioteca: `pu` (la que elegiste de internet) o `pa` (la caja automática de libretro, Hiedra 0.3.0). |
 | Marfil | `stamps`, `dev/<dispositivo>/data` | La biblioteca de libros: por clave `k`; `LEIDO` → valorado (con la última fecha de `tm`), `LEYENDO`/`PENDIENTE` → en curso. |
 | Marfil | `tiempo/<kid>/<escritor>` | Lo leído cada día: por dispositivo y día el máximo entre escritores, y luego se suman los dispositivos. |
+| Marfil | `subrayados/<kid>/<escritor>` | Los subrayados de cada libro (`n`: `x` texto, `o` nota, `c` creado, `l` etiqueta, `k` sitio); se unen por `k`+`c` entre escritores. La cita, el Diario, la ficha y el buscador. |
 | Marfil | `portadas/<kid>` | Tu portada en kDrive (`f`, `u`; `x` = quitada). Si no hay (o no hay token), `pu` de la biblioteca: la dirección de la que elegiste de internet (Marfil 0.12.0). |
 | Cobalto | `palabras/<dispositivo>` | Las palabras escritas cada día (se suman los dispositivos): el Diario. |
 | Cobalto | `lectura/<obra>/<capítulo>` | Los capítulos terminados, para «Escritos» (con Marfil en el móvil, se leen allí: Azabache abre Marfil con el extra `go=escritos`). |

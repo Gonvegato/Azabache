@@ -54,8 +54,7 @@ class Cita(val bookId: Long, val bookName: String, val author: String, val note:
 
 /** Todos tus subrayados que se leen bien sueltos (ni una palabra suelta ni media página). */
 fun citas(ctx: Context, books: List<ShellEntry>): List<Cita> = books.distinctBy { it.id }.flatMap { e ->
-    if (BookFiles.get(ctx, e.id) == null) emptyList()
-    else bookNotes(ctx, e.id).filter { it.text.length in 25..600 }.map { Cita(e.id, e.name, e.creator, it) }
+    bookNotes(ctx, e.id).filter { it.text.length in 25..600 }.map { Cita(e.id, e.name, e.creator, it) }
 }
 
 /** «La cita»: uno de tus subrayados, uno distinto cada día. Tocarlo abre el libro ahí. */
@@ -63,7 +62,7 @@ fun citas(ctx: Context, books: List<ShellEntry>): List<Cita> = books.distinctBy 
 fun RevistaCita(books: List<ShellEntry>) {
     val ctx = LocalContext.current
     // Se leen al cambiar los libros (no en cada repintado: cada libro guarda sus subrayados aparte)
-    val all = remember(books.map { it.id }) { citas(ctx, books) }
+    val all = remember(books.map { it.id }, Hermanas.version) { citas(ctx, books) }
     if (all.isEmpty()) return
     var shift by remember { mutableStateOf(0) }
     val i = Math.floorMod(LocalDate.now().toEpochDay() + shift, all.size.toLong()).toInt()
@@ -73,7 +72,7 @@ fun RevistaCita(books: List<ShellEntry>) {
         Text("«", color = ColGeneral, fontFamily = Display, fontWeight = FontWeight.Bold, fontSize = 64.sp, lineHeight = 44.sp)
         Text(
             c.note.text, fontFamily = Display, fontStyle = FontStyle.Italic, fontSize = 24.sp, lineHeight = 32.sp,
-            modifier = Modifier.clickable { Hermanas.abrir(ctx, Hermanas.PAQ_MARFIL) }
+            modifier = Modifier.clickable { Hermanas.leerEnMarfil(ctx, c.bookId) }
         )
         if (c.note.note.isNotBlank()) Text(c.note.note, color = ColGeneral, fontSize = 14.sp, lineHeight = 19.sp, modifier = Modifier.padding(top = 8.dp))
         Text(

@@ -147,4 +147,24 @@ class HermanasTest {
         assertEquals(customItemId("Zelda"), enl["j1"])
         assertEquals("j1", enl.entries.firstOrNull { it.value == customItemId("Zelda") }?.key)
     }
+
+    @Test fun losSubrayadosDeMarfilSeUnenPorSitioYHora() {
+        val kid = Hermanas.kidDe("libro:dune:herbert")
+        fun n(x: String, c: Long, k: String = "epubcfi(/6/4!/4/2)", o: String = "", l: String = "Cap. 1") = JSONObject().put("x", x).put("o", o).put("c", c).put("l", l).put("k", k)
+        val sub = JSONObject().put(kid, JSONObject()
+            .put("movilA", JSONObject().put("t", "Dune").put("a", "Frank Herbert").put("n", JSONArray().put(n("El miedo mata la mente.", 100L, o = "Letanía")).put(n("Quien controla la especia", 200L, k = "epubcfi(/6/8!/4/2)"))))
+            .put("movilB", JSONObject().put("t", "Dune").put("a", "Frank Herbert").put("n", JSONArray().put(n("El miedo mata la mente.", 100L)).put(n("  ", 300L)))))
+            .put("otro", JSONObject().put("movilA", JSONObject().put("n", JSONArray().put(n("De un libro sin ficha aquí", 50L)))))
+        val m = Hermanas.subrayadosDe(sub, mapOf(kid to 77L))
+        assertEquals(setOf(77L), m.keys)
+        val ns = m[77L]!!
+        assertEquals("el repetido entre escritores sale una vez; el vacío, no", 2, ns.size)
+        assertEquals("El miedo mata la mente.", ns[0].text); assertEquals("Letanía", ns[0].note); assertEquals("Cap. 1", ns[0].label); assertEquals(100L, ns[0].created); assertEquals("epubcfi(/6/4!/4/2)", ns[0].value)
+        assertEquals("Quien controla la especia", ns[1].text)
+        assertTrue(Hermanas.subrayadosDe(null, mapOf(kid to 77L)).isEmpty())
+        // Y van al Diario el día que se subrayaron
+        val f = FuentesDiario(listOf(Triple(BOOKS, emptyList(), listOf(Play(77L, "Dune", "", "", 1, emptyList(), creator = "Frank Herbert")))), citas = m)
+        val dias = diasDelDiario(f)
+        assertEquals(1, dias.size); assertEquals(2, dias[0].toques.sumOf { it.citas.size })
+    }
 }

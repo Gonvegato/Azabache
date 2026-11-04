@@ -9,6 +9,12 @@ Hermana de [Hiedra](https://github.com/Gonvegato/hiedra) (juegos), [Marfil](http
 y aquí aparecen solos, con su estado, sus horas y sus portadas, para valorarlos. Las películas, las series y tus categorías propias siguen
 aquí tal cual (con su «Añadir»).
 
+## 1.1.5: tus subrayados de Marfil, aquí
+
+- Los subrayados que haces en Marfil (su nodo ligero `subrayados`) salen en Azabache: en «La cita» de la portada (y su widget), en el Diario
+  (el día que los subrayaste), en la casilla «Subrayados y notas» de la ficha del libro y en el buscador. Tocar una cita abre ese libro en
+  Marfil. Los del lector viejo de Atrio se conservan.
+
 ## 1.1.4
 
 - Al oír el sello de una hermana solo se baja lo de esa (antes, lo de las tres, con los capítulos de Cobalto enteros, cada vez). Y si dos

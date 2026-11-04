@@ -847,13 +847,16 @@ fun BookFileBar(id: Long, name: String) {
 /** Un subrayado del lector (con su nota, si tiene). */
 data class BookNote(val value: String, val text: String, val note: String, val label: String, val created: Long, val index: Int, val frac: Double = -1.0)
 
+/** Los subrayados de un libro: los que hizo Atrio con su lector (si los hay) y los de Marfil (los que publica en tu cuenta). */
 fun bookNotes(ctx: Context, id: Long): List<BookNote> {
-    val a = BookFiles.state(ctx, id).optJSONArray("notes") ?: return emptyList()
-    return (0 until a.length()).mapNotNull { i ->
+    val a = BookFiles.state(ctx, id).optJSONArray("notes")
+    val propias = if (a == null) emptyList() else (0 until a.length()).mapNotNull { i ->
         val o = a.optJSONObject(i) ?: return@mapNotNull null
         BookNote(o.optString("value"), o.optString("text"), o.optString("note"), o.optString("label"), o.optLong("created"), o.optInt("index"),
             if (o.isNull("frac") || !o.has("frac")) -1.0 else o.optDouble("frac", -1.0))
     }.sortedWith(compareBy({ it.index }, { if (it.frac >= 0) it.frac else Double.MAX_VALUE }, { it.created }))
+    val marfil = Hermanas.subrayados(ctx)[id].orEmpty()
+    return if (marfil.isEmpty()) propias else (propias + marfil).distinctBy { it.text.trim() to it.created }
 }
 
 /** La casilla «Subrayados y notas» de la ficha de un libro: tocar uno abre el libro ahí. */
@@ -867,17 +870,11 @@ fun BookNotesBox(id: Long, name: String) {
         life.lifecycle.addObserver(obs)
         onDispose { life.lifecycle.removeObserver(obs) }
     }
-    val file = remember(tick) { BookFiles.get(ctx, id) }
-    val notes = remember(tick) { bookNotes(ctx, id) }
+    val notes = remember(tick, Hermanas.version) { bookNotes(ctx, id) }
     var all by remember { mutableStateOf(false) }
     val italic = androidx.compose.ui.text.font.FontStyle.Italic
-    if (file == null) {
-        Text("Adjunta el libro (casilla Lectura) para leerlo aquí; lo que subrayes y anotes aparecerá en esta casilla.",
-            color = Muted, fontFamily = Display, fontStyle = italic, fontSize = 15.sp, lineHeight = 20.sp)
-        return
-    }
     if (notes.isEmpty()) {
-        Text("Aún no has subrayado nada. En el lector, mantén pulsada una palabra y toca Subrayar o Nota.",
+        Text("Aún no has subrayado nada. Lo que subrayes y anotes en Marfil aparecerá en esta casilla.",
             color = Muted, fontFamily = Display, fontStyle = italic, fontSize = 15.sp, lineHeight = 20.sp)
         return
     }

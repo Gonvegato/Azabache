@@ -1095,7 +1095,7 @@ private fun AppContenido(
                                     fichas, notas,
                                     if (conLibros) Hermanas.leidoPorDia(ctx) else emptyMap(),
                                     if (conJuegos) Hermanas.jugadoPorDia(ctx) else emptyMap(),
-                                    emptyMap(), emptyList(), solo,
+                                    if (conLibros) Hermanas.subrayados(ctx) else emptyMap(), emptyList(), solo,
                                     palabras = Hermanas.palabras(ctx)
                                 )
                                 diasDelDiario(f)
