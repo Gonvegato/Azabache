@@ -9,6 +9,11 @@ Hermana de [Hiedra](https://github.com/Gonvegato/hiedra) (juegos), [Marfil](http
 y aquí aparecen solos, con su estado, sus horas y sus portadas, para valorarlos. Las películas, las series y tus categorías propias siguen
 aquí tal cual (con su «Añadir»).
 
+## 1.1.2: «Jugar» y «Leer» van a la ficha exacta
+
+- «Jugar» en una ficha que vino de Hiedra abre Hiedra **en ese juego** (y, si es del PC, directo a jugar); «Leer» en un libro de Marfil abre
+  Marfil **en ese libro** (Marfil 0.12.2 o más nueva, por la clave del libro). Antes solo abrían la app.
+
 ## 1.1.1
 
 - Azabache escucha también `marfil/lstamps` (el sello de lo leído de cada libro): los minutos de hoy salen en el Diario en cuanto cierras el libro
@@ -36,7 +41,7 @@ aquí tal cual (con su «Añadir»).
   toca. Una ficha que llega ya pasada o leída está «sin valorar» hasta que le pongas nota. En el Diario y el calendario salen lo jugado (Hiedra),
   lo leído (Marfil) y las palabras escritas (Cobalto) de cada día. Y **Escritos**, en el menú: los capítulos que diste por terminados en Cobalto,
   para leerlos aquí.
-- En las páginas, «Jugar» abre Hiedra y «Leer» abre Marfil (si están en el móvil).
+- En las páginas, «Jugar» abre Hiedra y «Leer» abre Marfil (si están en el móvil), en la ficha de ese juego o de ese libro.
 
 ## Capturas
 

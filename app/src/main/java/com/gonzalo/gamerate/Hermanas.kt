@@ -334,6 +334,20 @@ object Hermanas {
         return o.keys().asSequence().associateWithTo(HashMap()) { o.optLong(it) }
     }
     private fun guardaEnlaces(c: Context, app: String, m: Map<String, Long>) = guarda(c, "enl_$app", JSONObject().also { o -> m.forEach { (k, v) -> o.put(k, v) } }.toString())
+    /** Al revés: la ficha de aquí → el id del juego en Hiedra (o la clave del libro en Marfil), si la ficha vino de allí. */
+    fun enHermana(c: Context, app: String, id: Long): String? = enlaces(c, app).entries.firstOrNull { it.value == id }?.key
+    /** «Jugar»: Hiedra, en la ficha de ese juego si es suyo. */
+    fun jugarEnHiedra(c: Context, id: Long): Boolean {
+        val i = c.packageManager.getLaunchIntentForPackage(PAQ_HIEDRA) ?: return false
+        enHermana(c, "hiedra", id)?.let { i.putExtra("ficha", it).putExtra("jugar", true) }
+        c.startActivity(i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); return true
+    }
+    /** «Leer»: Marfil, en la ficha de ese libro si es suyo (Marfil 0.12.2 entiende «clave»). */
+    fun leerEnMarfil(c: Context, id: Long): Boolean {
+        val i = c.packageManager.getLaunchIntentForPackage(PAQ_MARFIL) ?: return false
+        enHermana(c, "marfil", id)?.let { i.putExtra("clave", it) }
+        c.startActivity(i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); return true
+    }
     /** Las portadas que se pusieron desde cada hermana (id o clave → portada), para no pisar la que cambies tú. */
     private fun puestas(c: Context, app: String): MutableMap<String, String> { val o = lee(c, "por_$app") ?: return HashMap(); return o.keys().asSequence().associateWithTo(HashMap()) { o.optString(it) } }
     private fun guardaPuestas(c: Context, app: String, m: Map<String, String>) = guarda(c, "por_$app", JSONObject().also { o -> m.forEach { (k, v) -> o.put(k, v) } }.toString())

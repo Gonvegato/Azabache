@@ -26,7 +26,7 @@ Se mira al abrir la app, al vincular la cuenta, al entrar en el Diario y en cuan
 
 - Una ficha reflejada lleva un **id fijo que sale del nombre** (el de siempre de las fichas propias, `customItemId`): dos móviles con
   Azabache crean la misma y al sincronizar no se duplican. Lo que ya tenías con el mismo nombre se enlaza y se completa.
-- El enlace id de Hiedra → id de aquí (y clave de Marfil → id) se guarda en el móvil (`hermanas`), y es lo que usan el Diario y las portadas.
+- El enlace id de Hiedra → id de aquí (y clave de Marfil → id) se guarda en el móvil (`hermanas`), y es lo que usan el Diario, las portadas y «Jugar»/«Leer» (abren Hiedra con los extras `ficha=<id>` y `jugar=true`, y Marfil con `clave=<clave>`).
 - Lo que manda la hermana: nombre, plataforma, autor, estado, horas, páginas, duraciones, fechas de empezado/pasado, favorito y la portada
   (solo si no la has cambiado tú). Lo que es de Azabache y nunca se toca: la nota, los criterios, la reseña, las casillas de la página.
 - Una ficha reflejada sin nota tiene todas las notas a **0**: es «sin valorar» (se ve así en su página, no cuenta en las cifras). Una ficha ya

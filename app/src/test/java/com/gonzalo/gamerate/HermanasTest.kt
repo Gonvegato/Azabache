@@ -138,4 +138,13 @@ class HermanasTest {
         assertEquals(listOf("La llegada", "El regreso"), caps.map { it.nombre }); assertEquals("Parte I", caps[1].parte); assertEquals(1200, caps[1].palabras)
         assertTrue(Hermanas.capitulosDe(null).isEmpty())
     }
+
+    @Test fun elEnlaceVaYVuelve() {
+        val enl = HashMap<String, Long>()
+        val js = Hermanas.juegosDe(mapOf("A" to blobH(juegoH("j1", "Zelda", "JUGANDO"))))
+        Hermanas.reflejarJuegos(js, emptyList(), emptyList(), enl, ahora = 1)
+        // Del id de Hiedra a la ficha de aquí, y de la ficha al id de Hiedra («Jugar» abre esa ficha en Hiedra)
+        assertEquals(customItemId("Zelda"), enl["j1"])
+        assertEquals("j1", enl.entries.firstOrNull { it.value == customItemId("Zelda") }?.key)
+    }
 }

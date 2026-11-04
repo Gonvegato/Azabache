@@ -809,8 +809,8 @@ private fun AppContenido(
     }
     fun primaryAction(o: Ongoing, nav: (Screen) -> Unit) {
         when {
-            o.kind.isGame && Hermanas.abrir(ctx, Hermanas.PAQ_HIEDRA) -> {}
-            o.kind.isBook && Hermanas.abrir(ctx, Hermanas.PAQ_MARFIL) -> {}
+            o.kind.isGame && Hermanas.jugarEnHiedra(ctx, o.play.id) -> {}
+            o.kind.isBook && Hermanas.leerEnMarfil(ctx, o.play.id) -> {}
             else -> nav(Screen.Note(o.play, null))
         }
     }
