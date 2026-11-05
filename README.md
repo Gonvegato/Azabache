@@ -9,6 +9,13 @@ Hermana de [Hiedra](https://github.com/Gonvegato/hiedra) (juegos), [Marfil](http
 y aquí aparecen solos, con su estado, sus horas y sus portadas, para valorarlos. Las películas, las series y tus categorías propias siguen
 aquí tal cual (con su «Añadir»).
 
+## 1.2.5
+
+- Textos al día: los avisos del actualizador y el de «se ha actualizado» dicen Azabache (decían Atrio), y las ayudas que mandaban a
+  «Ajustes → Servicios», «Ajustes → Cuenta» o «Ajustes → Tu nube» ahora nombran la pestaña real (General → Cuenta y pareja; Avanzado →
+  Servicios / Portadas de juegos / Tu nube).
+- El pie de Ajustes, como en sus hermanas: la versión como etiqueta y una línea que dice de quién es hermana.
+
 ## 1.2.4
 
 - **Arreglo**: en Android 11 o más, «Jugar en Hiedra», «Leer en Marfil» y «Escribir en Cobalto» no salían nunca, y el widget y el aviso de

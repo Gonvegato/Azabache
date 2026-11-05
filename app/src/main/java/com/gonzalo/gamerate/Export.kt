@@ -202,7 +202,7 @@ object Export {
             c.drawText(s, x, y, p)
         }
 
-        left(("Atrio · " + kind.title).uppercase(), m, 170f, 30f, MUTED, bodyBold)
+        left(("Azabache · " + kind.title).uppercase(), m, 170f, 30f, MUTED, bodyBold)
         left(if (name.isNotBlank()) "El $year de $name" else "Mi $year", m, 270f, 84f, CHAR, display)
         c.drawRect(m, 330f, W - m, 332f, fill(LINE))
 

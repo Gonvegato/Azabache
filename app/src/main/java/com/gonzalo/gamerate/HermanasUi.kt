@@ -95,7 +95,7 @@ fun LecturaCobaltoScreen(onBack: () -> Unit) {
                     color = Muted, fontFamily = Display, fontStyle = FontStyle.Italic, fontSize = 16.sp, modifier = Modifier.padding(top = 6.dp, bottom = if (marfil) 8.dp else 16.dp))
                 if (marfil) Text("Leer en Marfil →", color = ColGeneral, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.padding(bottom = 16.dp).clickable { Hermanas.leerEnMarfil(ctx) })
                 val obras = caps.groupBy { it.obra }
-                if (obras.isEmpty()) Text(if (Hermanas.ultimaVez(ctx) == 0L) "Todavía no se ha leído tu cuenta: entra en Ajustes → Cuenta." else "Cobalto aún no ha publicado ningún capítulo terminado.", color = Muted, fontFamily = Display, fontStyle = FontStyle.Italic, fontSize = 16.sp)
+                if (obras.isEmpty()) Text(if (Hermanas.ultimaVez(ctx) == 0L) "Todavía no se ha leído tu cuenta: entra en Ajustes → Cuenta y pareja." else "Cobalto aún no ha publicado ningún capítulo terminado.", color = Muted, fontFamily = Display, fontStyle = FontStyle.Italic, fontSize = 16.sp)
                 obras.forEach { (id, cs) ->
                     val t = cs.first()
                     Column(Modifier.fillMaxWidth().clickable { obra = id }.padding(vertical = 10.dp)) {

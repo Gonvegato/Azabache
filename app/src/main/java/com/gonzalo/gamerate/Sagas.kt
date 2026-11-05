@@ -568,7 +568,7 @@ fun SagaCoverSearchBody(name0: String, kind: Kind, sgdbKey: String, tmdbKey: Str
         scope.launch {
             try {
                 hits = when (src) {
-                    CoverSource.SGDB -> if (sgdbKey.isBlank()) error("Añade tu clave de SteamGridDB en Ajustes → Servicios") else Sgdb.search(q, sgdbKey)
+                    CoverSource.SGDB -> if (sgdbKey.isBlank()) error("Añade tu clave de SteamGridDB en Ajustes → Avanzado → Portadas de juegos") else Sgdb.search(q, sgdbKey)
                     CoverSource.LIBROS -> OpenLib.search(q)
                     CoverSource.PELIS -> Tmdb.search(q, tmdbKey)
                     CoverSource.SERIES -> TvMaze.search(q)

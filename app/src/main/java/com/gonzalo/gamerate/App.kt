@@ -155,7 +155,7 @@ private fun AppContenido(
         val v = runCatching { ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionName }.getOrNull().orEmpty()
         val sp = ctx.getSharedPreferences("actualizador", android.content.Context.MODE_PRIVATE)
         val antes = sp.getString("vista", "").orEmpty()
-        if (v.isNotEmpty() && v != antes) { sp.edit().putString("vista", v).apply(); if (antes.isNotEmpty()) snack.showSnackbar("Atrio se ha actualizado a la $v", withDismissAction = true) }
+        if (v.isNotEmpty() && v != antes) { sp.edit().putString("vista", v).apply(); if (antes.isNotEmpty()) snack.showSnackbar("Azabache se ha actualizado a la $v", withDismissAction = true) }
     }
 
     // Viendo la app de tu pareja (solo lectura).
@@ -637,7 +637,7 @@ private fun AppContenido(
             try {
                 val bm = Export.renderYear(ctx, k, list, y, store.myName)
                 val uri = withContext(Dispatchers.IO) { Export.saveJpgUri(ctx, bm, "ronron-$y-${normName(k.title)}") }
-                if (uri != null) Export.share(ctx, uri, "Mi $y en Atrio") else say("No se pudo preparar la imagen")
+                if (uri != null) Export.share(ctx, uri, "Mi $y en Azabache") else say("No se pudo preparar la imagen")
             } catch (e: Exception) { say("Error: ${e.message}") }
         }
     }
@@ -1320,7 +1320,7 @@ private fun AppContenido(
                     needsKey = kind.isGame || kind.isMovie, key = if (kind.isMovie) store.tmdbKey else key,
                     title = kind.title,
                     hint = when { kind.isGame -> "Título del juego"; kind.isBook -> "Título, autor o ISBN"; kind.isMovie -> "Título de la película"; else -> "Título de la serie" },
-                    keyMsg = if (kind.isMovie) "Para buscar películas, añade tu clave gratuita de TMDB en Ajustes → Servicios." else "Antes de buscar, añade tu API key en Ajustes.",
+                    keyMsg = if (kind.isMovie) "Para buscar películas, añade tu clave gratuita de TMDB en Ajustes → Avanzado → Servicios." else "Antes de buscar, añade tu API key en Ajustes.",
                     escanear = kind.isBook,
                     // Si no aparece en la búsqueda, a mano (con fotos de tus archivos), en cualquier categoría
                     onManual = { name -> screen = Screen.Search(s.forPlay, true, name) },

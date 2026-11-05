@@ -136,7 +136,7 @@ object KDrive {
     suspend fun test(ctx: Context): String = withContext(Dispatchers.IO) {
         prefs(ctx).edit().remove("home").apply()
         home(ctx)
-        "Conectado: Atrio guardará todo en «Mi carpeta/Atrio» de tu kDrive"
+        "Conectado: Azabache guardará todo en «Mi carpeta/Atrio» de tu kDrive (la misma carpeta que Atrio del PC)"
     }
 
     private class Item(val name: String, val id: Long, val dir: Boolean, val visibility: String)
@@ -680,10 +680,10 @@ object NubeSync {
         val suyo = Regex("""/app/share/(\d+)/""").find(x.l)?.groupValues?.get(1)
         val aqui = KDrive.drive(ctx)
         if (suyo != null && aqui.isNotBlank() && suyo != aqui)
-            return "Este dispositivo está conectado a otro kDrive (nº $aqui) y el archivo está en el nº $suyo: cámbialo en Ajustes → Tu nube"
+            return "Este dispositivo está conectado a otro kDrive (nº $aqui) y el archivo está en el nº $suyo: cámbialo en Ajustes → Avanzado → Tu nube"
         if (e is KDrive.Fail && e.message?.startsWith("No encuentro") == true)
             return if (runCatching { KDrive.reach(ctx) }.isSuccess) "Ese archivo ya no está en tu kDrive (¿lo borraste o lo moviste?): vuelve a adjuntarlo desde el dispositivo donde lo tengas"
-            else "No encuentro tu kDrive (nº $aqui) con este token: revísalo en Ajustes → Tu nube"
+            else "No encuentro tu kDrive (nº $aqui) con este token: revísalo en Ajustes → Avanzado → Tu nube"
         return e.message ?: "error"
     }
 

@@ -621,7 +621,7 @@ object Widgets {
         val ch = h - top - pad - textos
         val imgs = imagenes(ctx, items.map { it.cover }, px(ctx, ch))
         val zonas = listOf(
-            Zona(0f, 0f, w, top, abrir(ctx, "home"), "Abrir Atrio"),
+            Zona(0f, 0f, w, top, abrir(ctx, "home"), "Abrir Azabache"),
             Zona(pad, top, w - 2 * pad, h - top, null, "", listOf(items.map { tocar(d, it) to it.name }))
         )
         return Pagina(zonas) {

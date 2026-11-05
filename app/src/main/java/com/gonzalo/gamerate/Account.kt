@@ -226,7 +226,7 @@ object Account {
         if (r.code == 401) r = go(true)
         if (r.code == 401 || r.code == 403) {
             if (ok404) return null
-            throw Fail("Firebase no deja hacer eso. Revisa las reglas de la base de datos (Ajustes → Cuenta).")
+            throw Fail("Firebase no deja hacer eso. Revisa las reglas de la base de datos (Ajustes → Cuenta y pareja → «Reglas de Firebase»).")
         }
         if (r.code == 404) throw Fail("No encuentro la base de datos. Revisa la dirección.")
         if (r.code !in 200..299) throw Fail("Firebase respondió ${r.code}.")
