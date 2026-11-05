@@ -86,7 +86,10 @@ Generadas en el ordenador con fichas de ejemplo (`Capturas6Test`): [portada](doc
 
 ## Cómo se trabaja
 
-- Pruebas: `gradle :app:testDebugUnitTest` (0 fallos). `HermanasTest` cubre lo que se lee de las hermanas y cómo se refleja. Con
+- Pruebas: `gradle :app:testDebugUnitTest` (0 fallos). `HermanasTest` cubre lo que se lee de las hermanas y cómo se refleja;
+  `ContratoHermanasTest` lee `herramientas/casos/hermanas/*.json`, que son lo que Hiedra, Marfil y Cobalto suben **de verdad** (los genera la
+  prueba `ContratoTest` de cada una en su `app/build/outputs/contrato/`; al cambiar lo que sube una hermana, se copian aquí y esta prueba dice
+  si Azabache lo sigue entendiendo). Con
   `-Proborazzi.test.record=true` se graban las capturas (`app/build/outputs/roborazzi/`).
 - Versión nueva: subir `versionCode`/`versionName` (`app/build.gradle.kts`), `gradle :app:assembleRelease` y
   `python3 herramientas/subir-version.py Azabache-<versión>.apk` la deja en tu kDrive para que los móviles se actualicen solos. El
