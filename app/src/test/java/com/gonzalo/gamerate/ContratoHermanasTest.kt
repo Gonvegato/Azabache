@@ -71,6 +71,10 @@ class ContratoHermanasTest {
         assertEquals(1_000L, d[dia1]!![enl[dune.clave]]); assertEquals(3_600_000L, d[dia1 + 1]!![enl[dune.clave]])
         val s = Hermanas.subrayadosDe(c.getJSONObject("subrayados"), porKid)[enl[dune.clave]]!!
         assertEquals(2, s.size); assertEquals("El miedo mata la mente.", s[0].text); assertEquals("Letanía", s[0].note); assertEquals("Capítulo 1", s[0].label); assertEquals("epubcfi(/6/4!/4/2)", s[0].value)
+        // Los objetivos de lectura los fija Marfil: Azabache los lee tal cual
+        val o = Hermanas.objetivosDe(c.getJSONObject("objetivos"))!!
+        assertEquals(30, o.dia); assertEquals(24, o.ano)
+        assertNull(Hermanas.objetivosDe(null)); assertNull(Hermanas.objetivosDe(org.json.JSONObject()))
     }
 
     @Test fun loQuePublicaCobaltoSeLeeEntero() {

@@ -9,6 +9,12 @@ Hermana de [Hiedra](https://github.com/Gonvegato/hiedra) (juegos), [Marfil](http
 y aquí aparecen solos, con su estado, sus horas y sus portadas, para valorarlos. Las películas, las series y tus categorías propias siguen
 aquí tal cual (con su «Añadir»).
 
+## 1.2.9
+
+- **Un solo objetivo de lectura**: los libros del año y los minutos al día los fija Marfil. En Ajustes → Objetivos se ven tal cual
+  («lo fija Marfil») con un enlace para cambiarlos allí; la portada, el Diario, las estadísticas, el widget y el aviso de lectura usan
+  los de Marfil. El objetivo de juegos sigue siendo de Azabache. Hasta que Marfil suba los suyos, se ven los que tenías aquí.
+
 ## 1.2.8
 
 - La fila de orden y filtros (Recientes · Nombre · …) lleva el mismo degradado en los bordes que las pestañas.

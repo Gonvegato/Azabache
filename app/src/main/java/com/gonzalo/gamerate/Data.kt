@@ -697,10 +697,18 @@ class Store(ctx: Context) {
     fun setNopes(kind: Int, v: Set<String>) { p.edit().putString("nopes_$kind", v.toList().takeLast(600).joinToString(",")).apply() }
 
     // ---- Objetivos anuales ----
-    fun goal(kind: Int, year: Int): Int = p.getInt("goal_${kind}_$year", 0)
+    /**
+     * El objetivo del año. El de libros lo fija Marfil (ver [Hermanas.objetivosMarfil]): si Marfil ha subido el suyo, es ese; si no, el
+     * que tenías aquí. El de juegos y los de otros años, los de aquí.
+     */
+    fun goal(kind: Int, year: Int): Int =
+        (if (kind == 1 && year == LocalDate.now().year) Hermanas.objetivosMarfil(app)?.ano else null) ?: goalPropio(kind, year)
+    /** El objetivo guardado en Azabache (el que viaja con sus datos). */
+    fun goalPropio(kind: Int, year: Int): Int = p.getInt("goal_${kind}_$year", 0)
     /** Minutos de lectura al día que te propones (0 = sin objetivo). Viaja con tus ajustes a tus otros dispositivos. */
     var metaLectura: Int
-        get() = p.getInt("meta_lectura", 0)
+        // Lo fija Marfil (si ha subido el suyo); si no, el que tenías aquí
+        get() = Hermanas.objetivosMarfil(app)?.dia ?: p.getInt("meta_lectura", 0)
         set(v) { p.edit().putInt("meta_lectura", v.coerceIn(0, 600)).apply(); ajustesCambiados(app) }
     /** A qué hora avisar si aún no has cumplido el objetivo de lectura (-1 = sin aviso). Solo en este dispositivo. */
     var avisoLectura: Int
@@ -903,7 +911,7 @@ class Store(ctx: Context) {
         o.put("recs", JSONArray(p.getString("recs", "[]")))
         o.put("reacts", JSONObject(p.getString("reacts", "{}") ?: "{}"))
         o.put("goals", JSONObject()
-            .put("g", goal(0, LocalDate.now().year)).put("b", goal(1, LocalDate.now().year)))
+            .put("g", goalPropio(0, LocalDate.now().year)).put("b", goalPropio(1, LocalDate.now().year)))
         o.put("likes", JSONObject()
             .put("0", JSONArray(p.getString("likes_0", "[]")))
             .put("1", JSONArray(p.getString("likes_1", "[]"))))
@@ -1076,8 +1084,8 @@ class Store(ctx: Context) {
         r.optJSONObject("ajustes")?.let { applyAjustes(it) }
         r.optJSONObject("goals")?.let { g ->
             val y = LocalDate.now().year
-            if (goal(0, y) == 0 && g.optInt("g", 0) > 0) setGoal(0, y, g.optInt("g"))
-            if (goal(1, y) == 0 && g.optInt("b", 0) > 0) setGoal(1, y, g.optInt("b"))
+            if (goalPropio(0, y) == 0 && g.optInt("g", 0) > 0) setGoal(0, y, g.optInt("g"))
+            if (goalPropio(1, y) == 0 && g.optInt("b", 0) > 0) setGoal(1, y, g.optInt("b"))
         }
         return syncData() != before
     }

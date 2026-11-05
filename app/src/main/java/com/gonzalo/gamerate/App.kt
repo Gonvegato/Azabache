@@ -251,7 +251,7 @@ private fun AppContenido(
         onDispose { life.lifecycle.removeObserver(obs) }
     }
     LaunchedEffect(store.paired) { if (store.paired) Hermanas.pronto(ctx, ya = true) }
-    LaunchedEffect(Hermanas.version) { if (Hermanas.version > 0) reloadAll() }
+    LaunchedEffect(Hermanas.version) { if (Hermanas.version > 0) { reloadAll(); goalB = store.goal(1, year) } }
 
     // ---- Tu misma cuenta en otro dispositivo: lo que llegue de allí se vuelve a leer aquí ----
     LaunchedEffect(SyncBus.version) {

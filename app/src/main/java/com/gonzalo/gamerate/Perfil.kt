@@ -127,24 +127,30 @@ fun ProfileScreen(
                 Text(GAMES.title, Modifier.weight(1f), fontWeight = FontWeight.Medium)
                 Stepper(goalGames, "", { onGoal(0, goalGames - 1) }, { onGoal(0, goalGames + 1) })
             }
-            Spacer(Modifier.height(6.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(BOOKS.title, Modifier.weight(1f), fontWeight = FontWeight.Medium)
-                Stepper(goalBooks, "", { onGoal(1, goalBooks - 1) }, { onGoal(1, goalBooks + 1) })
-            }
-            // Lectura al día (con el lector de Atrio): se ve en la portada, en el Diario y en el propio lector
-            var meta by remember { mutableStateOf(store.metaLectura) }
+            // Los de lectura los fija Marfil, que es quien lee: aquí solo se enseñan (así no hay dos que se contradigan)
+            val meta = remember(Hermanas.version) { store.metaLectura }
             var aviso by remember { mutableStateOf(store.avisoLectura) }
-            fun ponMeta(v: Int) { meta = v.coerceIn(0, 600); store.metaLectura = meta; LecturaAviso.programa(ctx) }
             fun ponAviso(h: Int) { aviso = h; store.avisoLectura = h; LecturaAviso.programa(ctx) }
             Spacer(Modifier.height(6.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
-                    Text("Lectura al día", fontWeight = FontWeight.Medium)
-                    Text(if (meta > 0) "minutos leyendo en Marfil" else "sin objetivo", color = Muted, fontSize = 12.sp)
+                    Text(BOOKS.title, fontWeight = FontWeight.Medium)
+                    Text("lo fija Marfil", color = Muted, fontSize = 12.sp)
                 }
-                Stepper(meta, " min", { ponMeta(meta - 5) }, { ponMeta(meta + 5) })
+                Text(if (goalBooks > 0) "$goalBooks" else "sin reto", fontFamily = if (Skin.revista) Display else null, fontSize = 18.sp)
             }
+            Spacer(Modifier.height(6.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text("Lectura al día", fontWeight = FontWeight.Medium)
+                    Text("lo fija Marfil", color = Muted, fontSize = 12.sp)
+                }
+                Text(if (meta > 0) "$meta min" else "sin objetivo", fontFamily = if (Skin.revista) Display else null, fontSize = 18.sp)
+            }
+            if (Hermanas.instalada(ctx, Hermanas.PAQ_MARFIL)) {
+                Text("Cambiarlos en Marfil\u00A0→", color = ColGeneral, fontWeight = FontWeight.Bold, fontSize = 13.sp,
+                    modifier = Modifier.padding(top = 6.dp).clickable { Hermanas.abrir(ctx, Hermanas.PAQ_MARFIL, "ajustes") })
+            } else Text("Se cambian en Marfil (Ajustes → Lectura).", color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 6.dp))
             if (meta > 0) {
                 Spacer(Modifier.height(6.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {

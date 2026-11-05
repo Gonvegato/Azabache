@@ -421,6 +421,11 @@ object Hermanas {
     fun capitulos(c: Context): List<Capitulo> = capitulosDe(lee(c, "lectura_cobalto"))
     fun ultimaVez(c: Context) = prefs(c).getLong("ultima", 0L)
 
+    /** Los objetivos de lectura que fija Marfil (`marfil/objetivos`): minutos al día y libros del año. Null si Marfil aún no ha subido ninguno. */
+    class ObjetivosMarfil(val dia: Int, val ano: Int)
+    fun objetivosMarfil(c: Context): ObjetivosMarfil? = objetivosDe(lee(c, "objetivos_marfil"))
+    fun objetivosDe(o: JSONObject?): ObjetivosMarfil? = o?.takeIf { it.has("mod") }?.let { ObjetivosMarfil(it.optInt("dia").coerceIn(0, 600), it.optInt("ano").coerceIn(0, 999)) }
+
     // ================================================================ la red
 
     private fun blobs(store: Store, app: String): Map<String, JSONObject> {
@@ -511,6 +516,11 @@ object Hermanas {
                 val sub = nodo("marfil/subrayados")?.toString() ?: "{}"
                 if (sub != prefs(c).getString("subrayados_marfil", "")) { guarda(c, "subrayados_marfil", sub); cambio = true }
             }
+        }
+        // Los objetivos de lectura: los fija Marfil (aquí solo se enseñan)
+        if (toca("marfil")) runCatching {
+            val o = nodo("marfil/objetivos")?.toString()
+            if (o != null && o != prefs(c).getString("objetivos_marfil", "")) { guarda(c, "objetivos_marfil", o); cambio = true; LecturaAviso.programa(c) }
         }
         // Cobalto
         if (toca("cobalto")) {

@@ -13,6 +13,12 @@
       }
     }}
   }}},
+  "objetivos": {
+    "ano": 24,
+    "mod": 1700000000000,
+    "dia": 30,
+    "anio": 2026
+  },
   "kidDune": "d02b9975c5e9c3903b1d",
   "subrayados": {"d02b9975c5e9c3903b1d": {"marfil-A": {
     "a": "Frank Herbert",
@@ -34,5 +40,5 @@
       }
     ]
   }}},
-  "version": "0.12.5"
+  "version": "0.12.15"
 }
