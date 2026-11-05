@@ -1090,33 +1090,37 @@ object Widgets {
 
     // ------------------------------------------------------------------ Tu actividad (racha y mapa de días)
 
-    /** Minutos de cada día: lectura (lo que cuenta el lector), apuntes y lo que terminaste. */
+    /**
+     * Lo de cada día con la regla común de la racha ([Racha]): lo leído en Marfil (y en el lector que tenía Atrio), lo jugado en Hiedra
+     * y lo escrito en Cobalto. Un día que no cuenta vale 0; uno que cuenta, sus minutos (leído + jugado, y unas 20 palabras por minuto
+     * para lo escrito: solo para lo oscuro de su casilla), al menos 1.
+     */
     fun minutosPorDia(d: WDatos): Map<LocalDate, Int> {
+        val leido = HashMap<Long, Long>(); val jugado = HashMap<Long, Long>()
+        Hermanas.leidoPorDia(d.ctx).forEach { (dia, m) -> leido.merge(dia, m.values.sum(), Long::plus) }
+        Hermanas.jugadoPorDia(d.ctx).forEach { (dia, m) -> jugado.merge(dia, m.values.sum(), Long::plus) }
+        val palabras = Hermanas.palabras(d.ctx)
+        // Lo leído con el lector que tenía Atrio (libros de antes de Marfil)
+        d.kinds.filter { it.isBook }.forEach { k -> d.de(k).forEach { e ->
+            val st = BookFiles.state(d.ctx, e.id).optJSONObject("stats")?.optJSONObject("days")
+            st?.keys()?.forEach { key -> runCatching { LocalDate.parse(key).toEpochDay() }.getOrNull()?.let { leido.merge(it, st.optLong(key), Long::plus) } }
+        } }
+        return minutosDe(leido, jugado, palabras)
+    }
+
+    /** La cuenta de [minutosPorDia], pura (se prueba). */
+    fun minutosDe(leido: Map<Long, Long>, jugado: Map<Long, Long>, palabras: Map<Long, Int>): Map<LocalDate, Int> {
         val m = HashMap<LocalDate, Int>()
-        val zona = ZoneId.systemDefault()
-        fun dia(ms: Long) = java.time.Instant.ofEpochMilli(ms).atZone(zona).toLocalDate()
-        d.kinds.forEach { k ->
-            d.store.loadPlays(k.id).forEach { p ->
-                p.entries.forEach { en -> if (en.time > 0) m.merge(dia(en.time), 5, Int::plus) }
-            }
-            d.store.load(k.id).forEach { g -> if (g.end > 0L) m.merge(LocalDate.ofEpochDay(g.end), 30, Int::plus) }
-            if (k.isBook) d.de(k).forEach { e ->
-                val st = BookFiles.state(d.ctx, e.id).optJSONObject("stats")?.optJSONObject("days")
-                st?.keys()?.forEach { key ->
-                    runCatching { LocalDate.parse(key) }.getOrNull()?.let { m.merge(it, (st.optLong(key) / 60_000L).toInt().coerceAtLeast(1), Int::plus) }
-                }
-            }
+        for (dia in leido.keys + jugado.keys + palabras.keys) {
+            val l = leido[dia] ?: 0L; val j = jugado[dia] ?: 0L; val p = palabras[dia] ?: 0
+            if (!(Racha.cuentaTiempo(l) || Racha.cuentaTiempo(j) || Racha.cuentaPalabras(p))) continue
+            m[LocalDate.ofEpochDay(dia)] = (((l + j) / 60_000L).toInt() + p / 20).coerceAtLeast(1)
         }
         return m
     }
 
-    /** Días seguidos con algo (si hoy aún no, cuenta desde ayer). */
-    fun racha(m: Map<LocalDate, Int>, hoy: LocalDate = LocalDate.now()): Int {
-        var dia = if ((m[hoy] ?: 0) > 0) hoy else hoy.minusDays(1)
-        var n = 0
-        while ((m[dia] ?: 0) > 0) { n++; dia = dia.minusDays(1) }
-        return n
-    }
+    /** Días seguidos que cuentan (la regla común, [Racha]: si hoy aún no, desde ayer). */
+    fun racha(m: Map<LocalDate, Int>, hoy: LocalDate = LocalDate.now()): Int = Racha.dias(hoy.toEpochDay()) { (m[LocalDate.ofEpochDay(it)] ?: 0) > 0 }
 
     private fun actividad(d: WDatos, w: Float, h: Float): Pagina {
         val ctx = d.ctx

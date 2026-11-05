@@ -16,6 +16,7 @@ import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -158,9 +159,17 @@ class DiarioTest {
 
     @Test fun rachaYTalDia() {
         val hoy = LocalDate.of(2026, 10, 26).toEpochDay()
-        assertEquals(3, rachaDiario(listOf(hoy, hoy - 1, hoy - 2, hoy - 4), hoy))
-        assertEquals("hoy aún nada: cuenta desde ayer", 2, rachaDiario(listOf(hoy - 1, hoy - 2), hoy))
-        assertEquals(0, rachaDiario(listOf(hoy - 2), hoy))
+        // La regla común (Racha): cuenta un día con algo escrito, leído o jugado; uno con solo notas, no
+        fun escrito(d: Long) = Dia(d, emptyList(), emptyList(), palabras = 5)
+        assertEquals(3, rachaDiario(listOf(hoy, hoy - 1, hoy - 2, hoy - 4).map { escrito(it) }, hoy))
+        assertEquals("hoy aún nada: cuenta desde ayer", 2, rachaDiario(listOf(hoy - 1, hoy - 2).map { escrito(it) }, hoy))
+        assertEquals(0, rachaDiario(listOf(escrito(hoy - 2)), hoy))
+        assertEquals("solo una nota no cuenta", 1, rachaDiario(listOf(Dia(hoy, listOf(Nota(1, hoy, "x")), emptyList()), escrito(hoy - 1)), hoy))
+        // «Tu actividad» (el widget): lo leído, lo jugado y lo escrito, con la misma regla
+        val m = Widgets.minutosDe(mapOf(hoy to 59_999L, hoy - 1 to 120_000L), mapOf(hoy - 2 to 600_000L), mapOf(hoy - 3 to 1))
+        assertNull("menos de un minuto no cuenta", m[LocalDate.ofEpochDay(hoy)])
+        assertEquals(2, m[LocalDate.ofEpochDay(hoy - 1)]); assertEquals(10, m[LocalDate.ofEpochDay(hoy - 2)]); assertEquals(1, m[LocalDate.ofEpochDay(hoy - 3)])
+        assertEquals(3, Widgets.racha(m, LocalDate.ofEpochDay(hoy)))
         val dias = listOf(LocalDate.of(2025, 10, 26), LocalDate.of(2023, 10, 26), LocalDate.of(2025, 10, 25)).map { Dia(it.toEpochDay(), listOf(Nota(1, it.toEpochDay(), "x")), emptyList()) }
         assertEquals(listOf(1, 3), talDiaComoHoy(dias, LocalDate.of(2026, 10, 26)).map { it.first })
         assertEquals("Una frase larga que…", extracto("Una frase larga que sigue y sigue", 22))

@@ -46,3 +46,12 @@ sigue leyendo este mismo nodo. Azabache **no escribe** en los nodos de las herma
 ## Lo que Hiedra y Marfil leen de Azabache
 
 La valoración: `general` y `review` de cada ficha (por nombre y por la clave `juego:<título normalizado>`), como hasta ahora con Atrio.
+
+## Días seguidos (la racha)
+
+La misma regla en Hiedra, Marfil, Cobalto y Azabache (`Racha.kt` en cada una, con las mismas pruebas, `RachaTest`):
+
+- Un día **cuenta** si ese día jugaste o leíste **al menos un minuto**, o escribiste **al menos una palabra**. Cada app mira lo suyo
+  (Hiedra lo jugado, Marfil lo leído, Cobalto lo escrito); Azabache, las tres a la vez (basta con una).
+- La racha son los días seguidos que cuentan **hasta hoy**; si hoy todavía no cuenta, **hasta ayer** (no se rompe a primera hora).
+- Los días son los del calendario del móvil (`"AAAA-MM-DD"` en los nodos de tiempo y de palabras).

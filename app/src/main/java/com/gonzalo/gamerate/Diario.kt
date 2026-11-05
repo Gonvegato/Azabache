@@ -211,13 +211,13 @@ fun resumenDiario(dias: List<Dia>, desde: Long, hasta: Long): ResumenDiario {
     return ResumenDiario(ds.sumOf { it.terminados.size }, ds.sumOf { it.leidoMs }, ds.sumOf { it.jugadoMs }, ds.sumOf { it.notas.size }, ds.size, ds.sumOf { it.palabras })
 }
 
-/** Días seguidos con algo en el diario, contando hoy (o desde ayer, si hoy aún no hay nada). */
-fun rachaDiario(dias: Collection<Long>, hoy: Long = today()): Int {
-    val s = dias.toHashSet()
-    var d = if (hoy in s) hoy else hoy - 1
-    var n = 0
-    while (d in s) { n++; d-- }
-    return n
+/**
+ * Días seguidos leyendo, jugando o escribiendo, con la regla común de la familia ([Racha]: un minuto leído o jugado, o una palabra;
+ * contando hoy o, si hoy aún no, desde ayer). Un día con solo notas o valoraciones no cuenta.
+ */
+fun rachaDiario(dias: List<Dia>, hoy: Long = today()): Int {
+    val por = dias.associateBy { it.dia }
+    return Racha.dias(hoy) { d -> por[d]?.let { Racha.cuentaTiempo(it.leidoMs) || Racha.cuentaTiempo(it.jugadoMs) || Racha.cuentaPalabras(it.palabras) } == true }
 }
 
 /** «Tal día como hoy»: el mismo día de años anteriores, con cuántos años hace (lo más reciente primero). */

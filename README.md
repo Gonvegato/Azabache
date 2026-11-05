@@ -9,6 +9,12 @@ Hermana de [Hiedra](https://github.com/Gonvegato/hiedra) (juegos), [Marfil](http
 y aquí aparecen solos, con su estado, sus horas y sus portadas, para valorarlos. Las películas, las series y tus categorías propias siguen
 aquí tal cual (con su «Añadir»).
 
+## 1.2.10
+
+- **Una sola definición de «días seguidos»**, la misma regla en Hiedra, Marfil, Cobalto y Azabache (`Racha.kt`, con las mismas pruebas en las cuatro, y en el contrato): cuenta un día en que leíste o jugaste al menos un minuto, o escribiste al menos una palabra (en Marfil, Hiedra y Cobalto; basta con una); si hoy aún no, desde ayer.
+- El widget «Tu actividad» cuenta ahora lo que haces en las hermanas (antes contaba los apuntes y lo terminado de Atrio, que ya no se usan, y lo leído desde un segundo). El mapa de días se oscurece con lo leído más lo jugado (y lo escrito, a unas 20 palabras el minuto).
+- El Diario dice «N días seguidos leyendo, jugando o escribiendo», con la misma regla: un día con solo notas o valoraciones ya no la alarga.
+
 ## 1.2.9
 
 - **Un solo objetivo de lectura**: los libros del año y los minutos al día los fija Marfil. En Ajustes → Objetivos se ven tal cual

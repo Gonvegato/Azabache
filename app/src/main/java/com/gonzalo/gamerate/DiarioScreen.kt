@@ -111,7 +111,7 @@ fun DiarioScreen(
     val hoy = today()
     val lista = dias.orEmpty()
     val porDia = remember(lista) { lista.associateBy { it.dia } }
-    val racha = remember(lista, hoy) { rachaDiario(porDia.keys, hoy) }
+    val racha = remember(lista, hoy) { rachaDiario(lista, hoy) }
     val soloLectura = viendoPareja
     // (en la tablet en horizontal, una columna cómoda de leer, centrada)
     Column(Modifier.fillMaxSize().wrapContentWidth().widthIn(max = 880.dp).statusBarsPadding().padding(horizontal = if (Skin.revista) 18.dp else 14.dp)) {
@@ -128,7 +128,7 @@ fun DiarioScreen(
             Spacer(Modifier.weight(1f))
             FiltroDiario(kinds, filtro, onFiltro)
         }
-        if (racha >= 2) Text("$racha días seguidos con algo en tu diario", color = Muted, fontSize = 12.sp, modifier = Modifier.padding(bottom = 4.dp))
+        if (racha >= 2) Text("$racha días seguidos leyendo, jugando o escribiendo", color = Muted, fontSize = 12.sp, modifier = Modifier.padding(bottom = 4.dp))
         if (dias == null) { Spacer(Modifier.weight(1f)); return@Column }
         when (vista) {
             0 -> DiarioDias(lista, porDia[hoy], enCurso, soloLectura, pareja, nombreDe, acc)
