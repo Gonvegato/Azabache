@@ -9,6 +9,10 @@ Hermana de [Hiedra](https://github.com/Gonvegato/hiedra) (juegos), [Marfil](http
 y aquí aparecen solos, con su estado, sus horas y sus portadas, para valorarlos. Las películas, las series y tus categorías propias siguen
 aquí tal cual (con su «Añadir»).
 
+## 1.2.3
+
+- En Escritos, cada obra lleva también «Escribir en Cobalto →» (abre Cobalto en esa obra, si está en el móvil).
+
 ## 1.2.2
 
 - La segunda pestaña de Ajustes se llama «Avanzado», como en las hermanas (era «Servicios y copias»).

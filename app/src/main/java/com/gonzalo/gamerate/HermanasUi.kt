@@ -90,6 +90,7 @@ fun LecturaCobaltoScreen(onBack: () -> Unit) {
                 Text("SECCIÓN", color = ColGeneral, fontSize = 12.sp, fontWeight = FontWeight.Black, letterSpacing = 1.5.sp)
                 FitTitle("Escritos", 44.sp, 46.sp, fontWeight = FontWeight.Bold, modifier = Modifier.fillMaxWidth())
                 val marfil = remember { Hermanas.instalada(ctx, Hermanas.PAQ_MARFIL) }
+                val cobalto = remember { Hermanas.instalada(ctx, Hermanas.PAQ_COBALTO) }
                 Text(if (marfil) "Los capítulos que diste por terminados en Cobalto. Se leen con el lector de Marfil; aquí, solo de un vistazo." else "Los capítulos que diste por terminados en Cobalto. Aquí solo se leen (con Marfil en el móvil, con su lector).",
                     color = Muted, fontFamily = Display, fontStyle = FontStyle.Italic, fontSize = 16.sp, modifier = Modifier.padding(top = 6.dp, bottom = if (marfil) 8.dp else 16.dp))
                 if (marfil) Text("Leer en Marfil →", color = ColGeneral, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.padding(bottom = 16.dp).clickable { Hermanas.leerEnMarfil(ctx) })
@@ -100,7 +101,10 @@ fun LecturaCobaltoScreen(onBack: () -> Unit) {
                     Column(Modifier.fillMaxWidth().clickable { obra = id }.padding(vertical = 10.dp)) {
                         Text(t.titulo.ifBlank { "Sin título" }, fontFamily = Display, fontWeight = FontWeight.Bold, fontSize = 24.sp)
                         Text(listOfNotNull(t.autor.ifBlank { null }, "${cs.size} ${if (cs.size == 1) "capítulo" else "capítulos"}", "${cifraE(cs.sumOf { it.palabras })} palabras").joinToString(" · "), color = Muted, fontSize = 13.sp)
-                        if (marfil) Text("Leer en Marfil →", color = ColGeneral, fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.padding(top = 6.dp).clickable { Hermanas.leerEnMarfil(ctx, id) })
+                        Row(Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(18.dp)) {
+                            if (marfil) Text("Leer en Marfil →", color = ColGeneral, fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.clickable { Hermanas.leerEnMarfil(ctx, id) })
+                            if (cobalto) Text("Escribir en Cobalto →", fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.clickable { Hermanas.escribirEnCobalto(ctx, id) })
+                        }
                     }
                     Filete()
                 }

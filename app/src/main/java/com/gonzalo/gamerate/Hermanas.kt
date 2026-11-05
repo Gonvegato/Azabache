@@ -69,6 +69,12 @@ object Hermanas {
         if (destino.isNotBlank()) i.putExtra("go", destino)
         c.startActivity(i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); return true
     }
+    /** Abre Cobalto en esa obra (entiende el extra «obra», el id de Escribir). */
+    fun escribirEnCobalto(c: Context, obra: String): Boolean {
+        val i = c.packageManager.getLaunchIntentForPackage(PAQ_COBALTO) ?: return false
+        if (obra.isNotBlank()) i.putExtra("obra", obra)
+        c.startActivity(i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); return true
+    }
     /** Abre Marfil en sus «Escritos» (Marfil 0.12.0 o más nueva), donde los capítulos de Cobalto se leen con su lector. */
     fun leerEnMarfil(c: Context, obra: String = ""): Boolean {
         val i = c.packageManager.getLaunchIntentForPackage(PAQ_MARFIL) ?: return false
