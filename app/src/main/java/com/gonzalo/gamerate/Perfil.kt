@@ -105,7 +105,7 @@ fun ProfileScreen(
                         Text("Portadas en las listas", fontWeight = FontWeight.Bold, fontSize = 24.sp, fontFamily = Display)
                         Text(if (Skin.listCovers) "Cada título con su portada, como las sagas" else "Solo los títulos", color = Muted, fontSize = 13.sp)
                     }
-                    androidx.compose.material3.Switch(Skin.listCovers, { Skin.listCovers = it; Skin.save(ctx) })
+                    Interruptor(Skin.listCovers) { Skin.listCovers = it; Skin.save(ctx) }
                 }
             }
             Spacer(Modifier.height(12.dp))
@@ -152,7 +152,7 @@ fun ProfileScreen(
                         Text("Avisarme si no lo cumplo", fontWeight = FontWeight.Medium)
                         Text(if (aviso >= 0) "a las ${"%02d".format(aviso)}:00, con el libro por el que vas" else "sin aviso", color = Muted, fontSize = 12.sp)
                     }
-                    androidx.compose.material3.Switch(aviso >= 0, { on -> if (on) { onPedirAvisos(); ponAviso(21) } else ponAviso(-1) })
+                    Interruptor(aviso >= 0) { on -> if (on) { onPedirAvisos(); ponAviso(21) } else ponAviso(-1) }
                 }
                 if (aviso >= 0) Row(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.End) {
                     Stepper(aviso, ":00", { ponAviso((aviso + 23) % 24) }, { ponAviso((aviso + 1) % 24) })
@@ -179,7 +179,7 @@ fun ProfileScreen(
                         Text("Actualizarse sola", fontWeight = FontWeight.Medium)
                         Text("Busca versiones nuevas en «versiones» de tu kDrive (con wifi o datos: al abrir, cada minuto mientras la usas y, cerrada, cada pocas horas) y se instala sola cuando no la estás usando", color = Muted, fontSize = 12.sp)
                     }
-                    androidx.compose.material3.Switch(auto, { auto = it; Actualizador.ponActivo(actx, it) })
+                    Interruptor(auto) { auto = it; Actualizador.ponActivo(actx, it) }
                 }
                 // Qué pasó la última vez, y comprobar ya (para saber por qué no se actualiza, si no lo hace)
                 val alcance = androidx.compose.runtime.rememberCoroutineScope()
@@ -189,13 +189,13 @@ fun ProfileScreen(
                     color = Muted, fontSize = 12.sp, lineHeight = 16.sp)
                 var resultado by remember { mutableStateOf("") }
                 // Actualizar ya: mira, baja y instala sin esperar a que cierres la app (para cuando lo automático falla)
-                androidx.compose.material3.Button({
+                MagLink(if (mirando) "Actualizando…" else "Actualizar ahora", "Mira, baja e instala sin esperar", accent = !mirando) {
                     if (!mirando) { mirando = true; resultado = ""; alcance.launch { resultado = withContext(kotlinx.coroutines.Dispatchers.IO) { Actualizador.actualizarAhora(actx) }; mirando = false } }
-                }, enabled = !mirando) { Text(if (mirando) "Actualizando…" else "Actualizar ahora") }
-                if (resultado.isNotBlank()) Text(resultado, color = androidx.compose.material3.MaterialTheme.colorScheme.primary, fontSize = 13.sp, modifier = Modifier.padding(top = 4.dp))
-                androidx.compose.material3.TextButton({
+                }
+                if (resultado.isNotBlank()) Text(resultado, color = ColGeneral, fontFamily = Display, fontStyle = androidx.compose.ui.text.font.FontStyle.Italic, fontSize = 15.sp, modifier = Modifier.padding(top = 4.dp))
+                MagLink("Solo comprobar") {
                     if (!mirando) { mirando = true; alcance.launch { withContext(kotlinx.coroutines.Dispatchers.IO) { Actualizador.comprueba(actx, manual = true) }; mirando = false } }
-                }, enabled = !mirando) { Text("Solo comprobar") }
+                }
                 // Reabrirse sola tras actualizar: Android pide este permiso para abrir una app «desde atrás»
                 var sobre by remember { mutableStateOf(Actualizador.puedeReabrirSola(actx)) }
                 val vida = androidx.compose.ui.platform.LocalLifecycleOwner.current.lifecycle
@@ -205,9 +205,9 @@ fun ProfileScreen(
                 }
                 Text(if (sobre) "Tras actualizar, Azabache se vuelve a abrir sola" else "Tras actualizar, Azabache se cierra y te avisa para abrirla. Para que se reabra sola hace falta el permiso «Mostrar sobre otras apps»",
                     color = Muted, fontSize = 12.sp, lineHeight = 16.sp)
-                if (!sobre) androidx.compose.material3.TextButton({
+                if (!sobre) MagLink("Dar permiso", accent = true) {
                     runCatching { actx.startActivity(android.content.Intent(android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION, android.net.Uri.parse("package:${actx.packageName}")).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)) }
-                }) { Text("Dar permiso") }
+                }
                 Spacer(Modifier.height(8.dp))
             }
         }

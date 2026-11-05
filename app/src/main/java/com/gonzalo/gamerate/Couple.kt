@@ -572,38 +572,22 @@ fun CoupleSettings(store: Store, onPartner: (Partner?) -> Unit, onRestored: () -
                 "Tus datos en todos tus dispositivos (móvil, tableta y el PC), siempre al día. Tu pareja te encuentra por tu usuario.",
                 color = UiSoft, modifier = Modifier.padding(bottom = 10.dp)
             )
-            OutlinedTextField(
-                user, { user = it }, label = { Text("Usuario") }, singleLine = true,
-                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.None, autoCorrect = false, keyboardType = KeyboardType.Ascii),
-                shape = shp(14.dp), modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(Modifier.height(8.dp))
-            OutlinedTextField(
-                pass, { pass = it }, label = { Text("Contraseña") }, singleLine = true,
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, autoCorrect = false),
-                shape = shp(14.dp), modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(Modifier.height(8.dp))
-            OutlinedTextField(
-                name, { name = it }, label = { Text("Tu nombre (lo verá tu pareja)") }, singleLine = true,
-                shape = shp(14.dp), modifier = Modifier.fillMaxWidth()
-            )
+            CampoRevista("Usuario", user, "tu usuario de Atrio", ascii = true) { user = it }
+            CampoRevista("Contraseña", pass, "••••••", secreto = true) { pass = it }
+            CampoRevista("Tu nombre", name, "lo verá tu pareja") { name = it }
             if (needKey) {
-                Spacer(Modifier.height(8.dp))
-                OutlinedTextField(
-                    key, { key = it.trim() }, label = { Text("Clave web de Firebase") }, singleLine = true,
-                    shape = shp(14.dp), modifier = Modifier.fillMaxWidth()
-                )
+                CampoRevista("Clave web", key, "AIza…") { key = it.trim() }
                 Text(
                     "Consola de Firebase → ⚙ Configuración del proyecto → General → «Clave de API web». Empieza por AIza.",
                     color = UiSoft, fontSize = 13.sp, modifier = Modifier.padding(top = 4.dp)
                 )
             }
             Spacer(Modifier.height(10.dp))
-            androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(shape = pillShape(), enabled = !busy && user.isNotBlank() && pass.isNotBlank(), onClick = {
-                    val c = creds() ?: return@Button
+            run {
+                val listo = !busy && user.isNotBlank() && pass.isNotBlank()
+                MagLink(if (busy) "Entrando…" else "Entrar", "Con tu usuario y contraseña de Atrio", accent = listo) {
+                    if (!listo) return@MagLink
+                    val c = creds() ?: return@MagLink
                     launchOp {
                         if (!prepare()) return@launchOp msg
                         Account.signIn(store, c.first, c.second)
@@ -622,9 +606,10 @@ fun CoupleSettings(store: Store, onPartner: (Partner?) -> Unit, onRestored: () -
                             "Has entrado como ${store.accUser}. $r"
                         }
                     }
-                }) { Text("Entrar") }
-                OutlinedButton(shape = pillShape(), enabled = !busy && user.isNotBlank() && pass.isNotBlank(), onClick = {
-                    val c = creds() ?: return@OutlinedButton
+                }
+                MagLink("Crear cuenta", "Si aún no tienes una") {
+                    if (!listo) return@MagLink
+                    val c = creds() ?: return@MagLink
                     launchOp {
                         if (!prepare()) return@launchOp msg
                         Account.signUp(store, c.first, c.second)
@@ -636,16 +621,11 @@ fun CoupleSettings(store: Store, onPartner: (Partner?) -> Unit, onRestored: () -
                         val r = syncNow()
                         "Cuenta creada: ${store.accUser}. $r"
                     }
-                }) { Text("Crear cuenta") }
+                }
             }
             Spacer(Modifier.height(8.dp))
-            TextButton({ showUrl = !showUrl }) { Text(if (showUrl) "Ocultar base de datos" else "Otra base de datos…", color = Muted) }
-            if (showUrl) {
-                OutlinedTextField(
-                    url, { url = it }, label = { Text("Dirección de tu Firebase Realtime Database") }, singleLine = true,
-                    shape = shp(14.dp), modifier = Modifier.fillMaxWidth()
-                )
-            }
+            MagLink(if (showUrl) "Ocultar base de datos" else "Otra base de datos…") { showUrl = !showUrl }
+            if (showUrl) CampoRevista("Firebase", url, "dirección de tu Realtime Database") { url = it }
         } else {
             Text("Has entrado como ${store.accUser}", fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.height(4.dp))
@@ -662,17 +642,16 @@ fun CoupleSettings(store: Store, onPartner: (Partner?) -> Unit, onRestored: () -
                 color = if (err.isNotBlank()) ColGeneral else UiSoft, fontSize = 13.sp
             )
             Spacer(Modifier.height(8.dp))
-            OutlinedTextField(
-                name, { name = it }, label = { Text("Tu nombre (lo verá tu pareja)") }, singleLine = true,
-                shape = shp(14.dp), modifier = Modifier.fillMaxWidth()
-            )
+            CampoRevista("Tu nombre", name, "lo verá tu pareja") { name = it }
             Spacer(Modifier.height(8.dp))
-            androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(shape = pillShape(), enabled = !busy, onClick = {
+            run {
+                MagLink(if (busy) "Sincronizando…" else "Sincronizar ahora", accent = !busy) {
+                    if (busy) return@MagLink
                     store.myName = name
                     launchOp { syncNow() }
-                }) { Text("Sincronizar ahora") }
-                OutlinedButton(shape = pillShape(), enabled = !busy, onClick = {
+                }
+                MagLink("Comprobar la nube") {
+                    if (busy) return@MagLink
                     launchOp {
                         val r = Couple.check(store)
                         val here = store.itemCount()
@@ -681,32 +660,29 @@ fun CoupleSettings(store: Store, onPartner: (Partner?) -> Unit, onRestored: () -
                             DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(Date(r.first)) +
                             ". Aquí tienes $here." + if (r.second != here) " No coinciden: pulsa «Sincronizar ahora»." else " Todo al día."
                     }
-                }) { Text("Comprobar la nube") }
+                }
             }
 
             // ---- Pareja ----
             Spacer(Modifier.height(18.dp))
-            Text("Tu pareja", fontWeight = FontWeight.SemiBold)
+            MagLabel("Tu pareja")
             if (store.partnerUid.isBlank()) {
                 Text(
-                    "Escribe su usuario de Atrio. Así ella puede ver lo tuyo; cuando ella ponga el tuyo (${store.accUser}), tú verás lo suyo.",
+                    "Escribe su usuario de Atrio. Así puede ver lo tuyo; cuando ponga el tuyo (${store.accUser}), tú verás lo suyo.",
                     color = UiSoft, fontSize = 13.sp, modifier = Modifier.padding(vertical = 6.dp)
                 )
-                OutlinedTextField(
-                    partnerIn, { partnerIn = it }, label = { Text("Usuario de tu pareja") }, singleLine = true,
-                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.None, autoCorrect = false, keyboardType = KeyboardType.Ascii),
-                    shape = shp(14.dp), modifier = Modifier.fillMaxWidth()
-                )
+                CampoRevista("Pareja", partnerIn, "su usuario", ascii = true) { partnerIn = it }
                 Spacer(Modifier.height(8.dp))
-                Button(shape = pillShape(), enabled = !busy && partnerIn.isNotBlank(), onClick = {
+                MagLink("Compartir con mi pareja", accent = !busy && partnerIn.isNotBlank()) {
+                    if (busy || partnerIn.isBlank()) return@MagLink
                     launchOp {
                         Account.setPartner(store, partnerIn)
                         partnerIn = ""
                         val p = refreshPartner()
                         if (p != null) "Ya compartís: ves lo de ${p.name}."
-                        else "Listo. Cuando ${store.partnerUser} ponga tu usuario (${store.accUser}) en su Atrio, veréis lo del otro."
+                        else "Listo. Cuando ${store.partnerUser} ponga tu usuario (${store.accUser}) en su Azabache, veréis lo del otro."
                     }
-                }) { Text("Compartir con mi pareja") }
+                }
             } else {
                 val inf = info
                 val who = partnerUser.ifBlank { inf?.name ?: "tu pareja" }
@@ -714,22 +690,20 @@ fun CoupleSettings(store: Store, onPartner: (Partner?) -> Unit, onRestored: () -
                     when {
                         inf != null -> "Compartes con $who. Sus datos son de " +
                             DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(Date(inf.updated)) + "."
-                        shares == false -> "Ella ya puede ver lo tuyo. Tú verás lo suyo cuando $who ponga tu usuario (${store.accUser}) en su Atrio."
+                        shares == false -> "Ya puede ver lo tuyo. Tú verás lo suyo cuando $who ponga tu usuario (${store.accUser}) en su Azabache."
                         else -> "Compartes con $who. Aún no ha subido nada."
                     },
                     color = UiSoft, fontSize = 13.sp, modifier = Modifier.padding(vertical = 6.dp)
                 )
-                androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(shape = pillShape(), enabled = !busy, onClick = { launchOp { refreshPartner(); if (info != null) "Al día." else "Todavía no hay nada suyo que ver." } }) { Text("Mirar lo suyo") }
-                    OutlinedButton(shape = pillShape(), enabled = !busy, onClick = {
-                        launchOp {
-                            Account.clearPartner(store)
-                            info = null
-                            onPartner(null)
-                            PartnerWatch.cancel(ctx)
-                            "Ya no compartes tus datos con $who."
-                        }
-                    }) { Text("Dejar de compartir") }
+                MagLink("Mirar lo suyo", accent = true) { if (!busy) launchOp { refreshPartner(); if (info != null) "Al día." else "Todavía no hay nada suyo que ver." } }
+                MagLink("Dejar de compartir") {
+                    if (!busy) launchOp {
+                        Account.clearPartner(store)
+                        info = null
+                        onPartner(null)
+                        PartnerWatch.cancel(ctx)
+                        "Ya no compartes tus datos con $who."
+                    }
                 }
                 Spacer(Modifier.height(12.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -742,9 +716,7 @@ fun CoupleSettings(store: Store, onPartner: (Partner?) -> Unit, onRestored: () -
                         )
                     }
                     Spacer(Modifier.width(12.dp))
-                    Switch(
-                        checked = notify,
-                        onCheckedChange = { on ->
+                    Interruptor(notify) { on ->
                             notify = on
                             store.notifyPartner = on
                             if (on) {
@@ -756,62 +728,53 @@ fun CoupleSettings(store: Store, onPartner: (Partner?) -> Unit, onRestored: () -
                             } else {
                                 PartnerWatch.cancel(ctx)
                             }
-                        },
-                        colors = SwitchDefaults.colors(checkedTrackColor = Charcoal, checkedThumbColor = Crudo)
-                    )
+                    }
                 }
             }
 
             // ---- Recuperar ----
             Spacer(Modifier.height(18.dp))
-            Text("Recuperar datos de la nube", fontWeight = FontWeight.SemiBold)
+            MagLabel("Recuperar datos de la nube")
             Text(
                 "Lo último que subió cada uno de tus dispositivos (y las copias antiguas del código de pareja, si siguen ahí).",
                 color = UiSoft, fontSize = 13.sp
             )
-            Spacer(Modifier.height(6.dp))
-            OutlinedButton(shape = pillShape(), enabled = !busy, onClick = {
-                launchOp {
+            MagLink("Ver copias en la nube") {
+                if (!busy) launchOp {
                     cloud = Couple.nodes(store)
                     if (cloud.isNullOrEmpty()) "No hay copias." else ""
                 }
-            }) { Text("Ver copias en la nube") }
+            }
 
             // ---- Sesión ----
             Spacer(Modifier.height(18.dp))
-            androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(shape = pillShape(), enabled = !busy, onClick = { showPass = !showPass }) { Text("Cambiar contraseña") }
-                OutlinedButton(shape = pillShape(), enabled = !busy, onClick = {
-                    Account.signOut(store)
-                    signed = false
-                    info = null
-                    onPartner(null)
-                    PartnerWatch.cancel(ctx)
-                    msg = "Has cerrado la sesión. Tus datos siguen en este dispositivo."
-                }) { Text("Cerrar sesión") }
-            }
+            MagLabel("Sesión")
+            MagLink("Cambiar contraseña") { if (!busy) showPass = !showPass }
             if (showPass) {
-                Spacer(Modifier.height(8.dp))
-                OutlinedTextField(
-                    newPass, { newPass = it }, label = { Text("Contraseña nueva") }, singleLine = true,
-                    visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, autoCorrect = false),
-                    shape = shp(14.dp), modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(Modifier.height(6.dp))
-                Button(shape = pillShape(), enabled = !busy && newPass.length >= 6, onClick = {
+                CampoRevista("Nueva", newPass, "al menos 6 caracteres", secreto = true) { newPass = it }
+                MagLink("Guardar contraseña", accent = newPass.length >= 6) {
+                    if (busy || newPass.length < 6) return@MagLink
                     launchOp {
                         Account.changePassword(store, newPass)
                         newPass = ""
                         showPass = false
                         "Contraseña cambiada. En tus otros dispositivos seguirás dentro."
                     }
-                }) { Text("Guardar contraseña") }
+                }
+            }
+            MagLink("Cerrar sesión", "Tus datos siguen en este dispositivo") {
+                if (busy) return@MagLink
+                Account.signOut(store)
+                signed = false
+                info = null
+                onPartner(null)
+                PartnerWatch.cancel(ctx)
+                msg = "Has cerrado la sesión. Tus datos siguen en este dispositivo."
             }
         }
 
         Spacer(Modifier.height(10.dp))
-        TextButton({ showRules = !showRules }) { Text(if (showRules) "Ocultar reglas de Firebase" else "Reglas de Firebase para las cuentas", color = Muted) }
+        MagLink(if (showRules) "Ocultar reglas de Firebase" else "Reglas de Firebase para las cuentas") { showRules = !showRules }
         if (showRules) {
             Text(
                 "Pégalas en la consola de Firebase → Realtime Database → Reglas → Publicar. Cada uno solo puede escribir en lo suyo, " +
@@ -822,11 +785,11 @@ fun CoupleSettings(store: Store, onPartner: (Partner?) -> Unit, onRestored: () -
                 Account.RULES, fontSize = 12.sp,
                 modifier = Modifier.fillMaxWidth().background(UiTint, shp(14.dp)).padding(12.dp)
             )
-            OutlinedButton({
+            MagLink("Copiar reglas") {
                 val cm = ctx.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                 cm.setPrimaryClip(ClipData.newPlainText("reglas", Account.RULES))
                 msg = "Reglas copiadas."
-            }, shape = pillShape()) { Text("Copiar reglas") }
+            }
         }
 
         if (msg.isNotEmpty()) {

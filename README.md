@@ -9,6 +9,11 @@ Hermana de [Hiedra](https://github.com/Gonvegato/hiedra) (juegos), [Marfil](http
 y aquí aparecen solos, con su estado, sus horas y sus portadas, para valorarlos. Las películas, las series y tus categorías propias siguen
 aquí tal cual (con su «Añadir»).
 
+## 1.2.1
+
+- En Ajustes, la cuenta y la pareja (usuario, contraseña, entrar, sincronizar, compartir…), los interruptores y «Actualizarse sola» usan
+  las casillas y los enlaces de la revista, los mismos que en Hiedra, Marfil y Cobalto, en vez de los cuadros y botones de Material.
+
 ## 1.2.0: como sus hermanas
 
 - **La portada en la ficha**: una casilla «Portada» (la misma imagen que en Hiedra o en Marfil) en la primera fila de cada ficha, junto al

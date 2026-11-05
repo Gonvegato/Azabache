@@ -1,6 +1,7 @@
 package com.gonzalo.gamerate
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
@@ -35,6 +36,40 @@ import androidx.compose.ui.unit.sp
  */
 
 /** Antetítulo de casilla (con una acción a la derecha, opcional). */
+/** Una casilla de texto con el estilo de la revista (la misma que en Hiedra, Marfil y Cobalto): etiqueta en versalitas, texto en cursiva sobre un filete. */
+@Composable
+fun CampoRevista(etiqueta: String, valor: String, pista: String, secreto: Boolean = false, ascii: Boolean = false, alCambiar: (String) -> Unit) {
+    Column(Modifier.fillMaxWidth().padding(top = 6.dp)) {
+        Row(Modifier.fillMaxWidth().padding(vertical = 6.dp), verticalAlignment = Alignment.Bottom) {
+            Text(etiqueta.uppercase(), color = Muted, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp, modifier = Modifier.width(96.dp).padding(bottom = 3.dp))
+            Box(Modifier.weight(1f)) {
+                if (valor.isEmpty()) Text(pista, color = Muted, fontFamily = Display, fontStyle = FontStyle.Italic, fontSize = 18.sp)
+                androidx.compose.foundation.text.BasicTextField(valor, alCambiar, singleLine = true,
+                    textStyle = androidx.compose.ui.text.TextStyle(color = Charcoal, fontFamily = Display, fontStyle = FontStyle.Italic, fontSize = 18.sp),
+                    cursorBrush = androidx.compose.ui.graphics.SolidColor(ColGeneral),
+                    visualTransformation = if (secreto) androidx.compose.ui.text.input.PasswordVisualTransformation() else androidx.compose.ui.text.input.VisualTransformation.None,
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                        capitalization = if (ascii || secreto) androidx.compose.ui.text.input.KeyboardCapitalization.None else androidx.compose.ui.text.input.KeyboardCapitalization.Words,
+                        autoCorrect = false,
+                        keyboardType = if (secreto) androidx.compose.ui.text.input.KeyboardType.Password else if (ascii) androidx.compose.ui.text.input.KeyboardType.Ascii else androidx.compose.ui.text.input.KeyboardType.Text),
+                    modifier = Modifier.fillMaxWidth())
+            }
+        }
+        Box(Modifier.fillMaxWidth().height(2.dp).background(Charcoal))
+    }
+}
+
+/** El interruptor de la revista (el mismo que en Hiedra, Marfil y Cobalto): un cuadrado que se enciende en el acento. */
+@Composable
+fun Interruptor(activo: Boolean, alCambiar: (Boolean) -> Unit) {
+    val fondo by androidx.compose.animation.animateColorAsState(if (activo) ColGeneral else Sand, label = "sw")
+    val forma = androidx.compose.foundation.shape.RoundedCornerShape(4.dp)
+    Box(Modifier.width(48.dp).height(28.dp).clip(forma).background(fondo).border(1.dp, if (activo) ColGeneral else Line, forma)
+        .clickable(role = androidx.compose.ui.semantics.Role.Switch) { alCambiar(!activo) }.padding(3.dp)) {
+        Box(Modifier.align(if (activo) Alignment.CenterEnd else Alignment.CenterStart).size(22.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(3.dp)).background(if (activo) sobre(ColGeneral, Paper, Charcoal) else Muted))
+    }
+}
+
 /** La casilla «Portada» de la ficha: la misma imagen que tiene en Hiedra o en Marfil (o la que pusiste aquí); sin ninguna, la inicial sobre arena. */
 @Composable
 fun MagPortada(cover: String, name: String) {
