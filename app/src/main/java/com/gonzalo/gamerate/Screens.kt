@@ -479,7 +479,7 @@ fun SettingsScreen(
             // La versión sale del propio APK (antes estaba escrita a mano y se quedó en 3.6)
             val actx = androidx.compose.ui.platform.LocalContext.current
             val ver = remember { try { actx.packageManager.getPackageInfo(actx.packageName, 0).versionName } catch (e: Exception) { null } ?: "" }
-            Text("Atrio $ver", fontWeight = FontWeight.SemiBold)
+            Text("Azabache $ver", fontWeight = FontWeight.SemiBold)
             Text(
                 "Portadas de juegos: SteamGridDB. Libros: Open Library y Google Books. Películas: TMDB (este producto usa la API de TMDB, pero TMDB no lo respalda ni lo certifica). Series: TVmaze (CC BY-SA). Recomendaciones: RAWG. Letras: Fraunces e Inter (SIL Open Font License).",
                 color = UiSoft, fontSize = 13.sp
@@ -867,7 +867,7 @@ private fun LocalArt(game: Game, hasHero: Boolean, hero: Boolean, onTarget: (Boo
             Text("ESTÁ EN OTRO DISPOSITIVO TUYO", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Black, letterSpacing = 1.3.sp)
             Spacer(Modifier.height(6.dp))
             val otros = Suite.phones()
-            if (otros.isEmpty()) Text("Abre Atrio en el móvil donde elegiste esta foto y podrás descargarla aquí, en su calidad original.", color = Muted, fontSize = 13.sp)
+            if (otros.isEmpty()) Text("Abre Azabache en el móvil donde elegiste esta foto y podrás descargarla aquí, en su calidad original.", color = Muted, fontSize = 13.sp)
             otros.forEach { d ->
                 OutlinedButton({
                     if (bajando != null) return@OutlinedButton
@@ -887,7 +887,7 @@ private fun LocalArt(game: Game, hasHero: Boolean, hero: Boolean, onTarget: (Boo
         Spacer(Modifier.height(12.dp))
         Text(
             (if (hero) "Se recorta a lo ancho, como los fondos. " else "Se recorta en vertical, como las portadas. ") +
-                "La imagen se guarda en este dispositivo y no se sube a internet: tu pareja no la verá. Tus otros dispositivos (el PC, la tableta) pueden descargarla mientras tengas Atrio abierto aquí.",
+                "La imagen se guarda en este dispositivo y no se sube a internet: tu pareja no la verá. Tus otros dispositivos (el PC, la tableta) pueden descargarla mientras tengas Azabache abierta aquí.",
             color = Muted, fontSize = 12.sp
         )
     }

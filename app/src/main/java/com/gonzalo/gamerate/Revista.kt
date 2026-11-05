@@ -35,6 +35,15 @@ import androidx.compose.ui.unit.sp
  */
 
 /** Antetítulo de casilla (con una acción a la derecha, opcional). */
+/** La casilla «Portada» de la ficha: la misma imagen que tiene en Hiedra o en Marfil (o la que pusiste aquí); sin ninguna, la inicial sobre arena. */
+@Composable
+fun MagPortada(cover: String, name: String) {
+    Box(Modifier.fillMaxWidth(0.86f).aspectRatio(2f / 3f).background(Sand), contentAlignment = Alignment.Center) {
+        if (cover.isNotBlank()) coil.compose.AsyncImage(cover, name, Modifier.fillMaxSize(), contentScale = androidx.compose.ui.layout.ContentScale.Crop, colorFilter = Ediciones.filtro)
+        else Text(name.take(1).uppercase(), fontFamily = Display, fontWeight = FontWeight.Bold, fontSize = 44.sp, color = Muted)
+    }
+}
+
 @Composable
 fun MagLabel(text: String, action: String? = null, onAction: (() -> Unit)? = null) {
     Row(Modifier.fillMaxWidth().padding(bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -277,6 +286,7 @@ fun RevistaGameRead(
     Spacer(Modifier.height(14.dp))
 
     val defs = linkedMapOf<String, MagDef>()
+    if (kind.isGame || kind.isBook) defs["portada"] = MagDef("Portada") { MagPortada(g.cover, g.name) }
     defs["nota"] = MagDef("Nota") {
         if (Hermanas.sinValorar(g)) {
             Text("Sin valorar", fontFamily = Display, fontWeight = FontWeight.Bold, fontSize = 30.sp, lineHeight = 32.sp)
@@ -307,9 +317,9 @@ fun RevistaGameRead(
     }
     defs["datos"] = MagDef("Datos") { GameFacts(g, kind) }
     val defaults = when {
-        kind.isGame -> magRows(listOf("horas", "nota"), listOf("opinion"), listOf("diario"), listOf("datos", "enlaces"))
+        kind.isGame -> magRows(listOf("portada", "nota"), listOf("opinion"), listOf("horas"), listOf("diario"), listOf("datos", "enlaces"))
         kind.isMovie || kind.isTv -> magRows(listOf("critica", "nota"), listOf("opinion"), listOf("diario"), listOf("datos", "enlaces"), listOf("donde"))
-        kind.isBook -> magRows(listOf("lectura", "nota"), listOf("opinion"), listOf("diario"), listOf("datos", "enlaces"))
+        kind.isBook -> magRows(listOf("portada", "nota"), listOf("opinion"), listOf("lectura"), listOf("diario"), listOf("datos", "enlaces"))
         else -> magRows(listOf("datos", "nota"), listOf("opinion"), listOf("diario"), listOf("enlaces"))
     }
     MagPage("v:${kind.id}:${g.id}", "tpl:v:${kind.id}", kind.title, defaults, defs, kind, g.id, g.name, designing)

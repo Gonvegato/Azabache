@@ -56,7 +56,7 @@ class EstadoTest {
         rule.setContent { MaterialTheme(colorScheme = appColors(), typography = AppTypography) { Surface(Modifier.fillMaxSize(), color = Paper) { App(s, 0L, false, "") {} } } }
         rule.waitForIdle()
         rule.onAllNodesWithText("Libros", ignoreCase = true)[0].performClick(); rule.waitForIdle()
-        rule.onAllNodesWithText("En lista", ignoreCase = true)[0].performClick(); rule.waitForIdle()
+        rule.onAllNodesWithText("Pendiente", ignoreCase = true)[0].performClick(); rule.waitForIdle()
         rule.onAllNodesWithText("Proyecto Hail Mary", ignoreCase = true)[0].performClick(); rule.waitForIdle()
         com.github.takahirom.roborazzi.captureScreenRoboImage("build/outputs/roborazzi/estado_1_ficha.png")
         rule.onAllNodesWithText("EDITAR", ignoreCase = true)[0].performClick(); rule.waitForIdle()
@@ -75,7 +75,7 @@ class EstadoTest {
         org.junit.Assert.assertTrue(rule.onAllNodesWithText("Proyecto Hail Mary", ignoreCase = true).fetchSemanticsNodes().isNotEmpty())
         // Y vuelve a la lista igual de fácil
         rule.onAllNodesWithText("Proyecto Hail Mary", ignoreCase = true)[0].performClick(); rule.waitForIdle()
-        rule.onAllNodesWithText("EN LISTA", ignoreCase = true)[0].performScrollTo().performClick(); rule.waitForIdle()
+        rule.onAllNodesWithText("PENDIENTE", ignoreCase = true)[0].performScrollTo().performClick(); rule.waitForIdle()
         org.junit.Assert.assertEquals(0, Store(ctx).loadPlays(1).single().status)
     }
 
@@ -88,7 +88,7 @@ class EstadoTest {
         rule.setContent { MaterialTheme(colorScheme = appColors(), typography = AppTypography) { Surface(Modifier.fillMaxSize(), color = Paper) { App(s, 0L, false, "") {} } } }
         rule.waitForIdle()
         rule.onAllNodesWithText("Libros", ignoreCase = true)[0].performClick(); rule.waitForIdle()
-        rule.onAllNodesWithText("En lista", ignoreCase = true)[0].performClick(); rule.waitForIdle()
+        rule.onAllNodesWithText("Pendiente", ignoreCase = true)[0].performClick(); rule.waitForIdle()
         rule.onAllNodesWithText("Klara y el Sol", ignoreCase = true)[0].performClick(); rule.waitForIdle()
         rule.onAllNodesWithText("EDITAR", ignoreCase = true)[0].performClick(); rule.waitForIdle()
         rule.onAllNodesWithText("DATOS Y NOTA", substring = true)[0].performClick(); rule.waitForIdle()

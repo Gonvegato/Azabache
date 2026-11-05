@@ -410,7 +410,7 @@ object Skin {
     /** Tamaño de las portadas en las bibliotecas: 0 normal, 1 grandes, 2 pequeñas. */
     var covers by mutableStateOf(0)
     /** Revista: las listas con la portada al lado del título (como las sagas), en lugar de solo títulos. */
-    var listCovers by mutableStateOf(false)
+    var listCovers by mutableStateOf(true)
     /** Dock con el nombre del destino elegido (si no, solo iconos). */
     var dockLabels by mutableStateOf(true)
     /** La interfaz: solo hay una, la revista (la antigua, con dock, ya no existe). */
@@ -525,7 +525,7 @@ object Skin {
         fondoPropio = p.getLong("skin_fondo_propio", 0L); tintaPropia = p.getLong("skin_tinta_propia", 0L); acentoPropio = p.getLong("skin_acento_propio", 0L)
         letraTitulos = p.getString("skin_letra_titulos", "").orEmpty(); letraTexto = p.getString("skin_letra_texto", "").orEmpty()
         covers = p.getInt("skin_covers", 0)
-        listCovers = p.getBoolean("skin_listcovers", false)
+        listCovers = p.getBoolean("skin_listcovers", true)
         dockLabels = p.getBoolean("skin_docklabels", true)
         // La interfaz Feed (1) ya no existe: pasa a Revista
         shell = 2

@@ -121,6 +121,7 @@ fun PlayDetailScreen(
                     MagLink("Marcar «${kind.statuses[1]}»", accent = true) { empezar() }
                 }
             }
+            if (kind.isGame || kind.isBook) defs["portada"] = MagDef("Portada") { MagPortada(p.cover, p.name) }
             defs["estado"] = MagDef(if (b != null) "Nota" else "Estado") {
                 if (b != null) MagScore(b.general, b.scores(), kind)
                 else FitTitle(kind.statuses.getOrElse(p.status) { "" }, 30.sp, 32.sp)
@@ -167,9 +168,9 @@ fun PlayDetailScreen(
                 MagLink("Datos de la ficha") { editing = true }
             }
             val defaults = when {
-                kind.isGame -> magRows(listOf("estado"), listOf("jugar"), listOf("apuntes"), listOf("diario"), listOf("horas", "enlaces"))
+                kind.isGame -> magRows(listOf("portada", "estado"), listOf("jugar"), listOf("apuntes"), listOf("diario"), listOf("horas", "enlaces"))
                 kind.isMovie || kind.isTv -> magRows(listOf("critica", "estado"), listOf("donde"), listOf("progreso"), listOf("apuntes"), listOf("diario"), listOf("enlaces"))
-                kind.isBook -> magRows(listOf("lectura", "estado"), listOf("apuntes"), listOf("diario"), listOf("enlaces"))
+                kind.isBook -> magRows(listOf("portada", "estado"), listOf("lectura"), listOf("apuntes"), listOf("diario"), listOf("enlaces"))
                 else -> magRows(listOf("estado"), listOf("apuntes"), listOf("diario"), listOf("enlaces"))
             }
             MagPage("p:${kind.id}:${p.id}", "tpl:p:${kind.id}", kind.title, defaults, defs, kind, p.id, p.name, designing)

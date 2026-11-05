@@ -9,6 +9,14 @@ Hermana de [Hiedra](https://github.com/Gonvegato/hiedra) (juegos), [Marfil](http
 y aquí aparecen solos, con su estado, sus horas y sus portadas, para valorarlos. Las películas, las series y tus categorías propias siguen
 aquí tal cual (con su «Añadir»).
 
+## 1.2.0: como sus hermanas
+
+- **La portada en la ficha**: una casilla «Portada» (la misma imagen que en Hiedra o en Marfil) en la primera fila de cada ficha, junto al
+  estado o a la nota, como en sus hermanas. Entra sola en las maquetas que ya tenías (si no la quieres, se quita en «Editar»).
+- **Portadas en las listas**, encendidas de serie (Ajustes → Apariencia las apaga), con el tamaño de las listas de Hiedra y Marfil.
+- Los estados se llaman como en Hiedra y Marfil: **Pendiente · Jugando/Leyendo · Abandonado** (antes «En lista» y «Dropeado»).
+- «← Azabache» en las listas (decía «← Atrio»), y los textos que aún nombraban a Atrio.
+
 ## 1.1.5: tus subrayados de Marfil, aquí
 
 - Los subrayados que haces en Marfil (su nodo ligero `subrayados`) salen en Azabache: en «La cita» de la portada (y su widget), en el Diario

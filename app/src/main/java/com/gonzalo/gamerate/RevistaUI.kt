@@ -31,7 +31,7 @@ fun EnlaceRevista(texto: String, modifier: Modifier = Modifier, acento: Boolean 
         modifier = modifier.semantics { role = Role.Button }.press(haptic = false, onClick = onClick).padding(vertical = 10.dp))
 }
 
-/** «← VOLVER» (o «← ATRIO» en lo que cuelga de la portada): siempre el mismo, arriba a la izquierda. */
+/** «← VOLVER» (o «← AZABACHE» en lo que cuelga de la portada): siempre el mismo, arriba a la izquierda. */
 @Composable
 fun VolverRevista(onClick: () -> Unit, texto: String = "Volver") = EnlaceRevista("← $texto", onClick = onClick)
 

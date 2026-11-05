@@ -309,7 +309,7 @@ fun StatsScreen(
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 BigNumber("${st.done}", kind.doneWord, Modifier.weight(1f))
                 BigNumber("${st.inProgress}", kind.statuses[1], Modifier.weight(1f))
-                BigNumber("${st.listed}", "En lista", Modifier.weight(1f))
+                BigNumber("${st.listed}", "Pendientes", Modifier.weight(1f))
             }
             Spacer(Modifier.height(8.dp))
             Stat(kind.statuses[2] + "s", "" + st.dropped)

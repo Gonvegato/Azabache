@@ -282,7 +282,7 @@ private fun RevistaLibrary(l: LibUi) {
     ) {
         item {
             Row(Modifier.fillMaxWidth().padding(top = 6.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                if (l.onBack != null) TextLink("← ATRIO", onClick = l.onBack)
+                if (l.onBack != null) TextLink("← AZABACHE", onClick = l.onBack)
                 Spacer(Modifier.weight(1f))
                 TextLink(if (l.searching) "CERRAR" else "BUSCAR") { l.setSearching(!l.searching); if (l.searching) l.setQuery("") }
                 TextLink("CIFRAS", onClick = l.onStats)
@@ -318,9 +318,9 @@ private fun RevistaLibrary(l: LibUi) {
             // El título grande, la nota a la derecha y el estudio (o autor) debajo; con «Portadas en las listas», su
             // portada a la izquierda, como en las sagas
             Row(Modifier.fillMaxWidth().press(haptic = false) { l.open(c) }.padding(vertical = 14.dp).rise(i, i < 12), verticalAlignment = Alignment.CenterVertically) {
-                if (Skin.listCovers) { ListCover(c.cover, c.name, 74.dp, 104.dp); Spacer(Modifier.width(16.dp)) }
+                if (Skin.listCovers) { ListCover(c.cover, c.name, 44.dp, 62.dp); Spacer(Modifier.width(16.dp)) }
                 Column(Modifier.weight(1f)) {
-                    FitTitle(c.name, 30.sp, 32.sp, letterSpacing = (-0.5).sp, maxLines = 3, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                    FitTitle(c.name, 26.sp, 28.sp, letterSpacing = (-0.5).sp, maxLines = 3, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
                     val who = (c.game?.creator ?: c.play?.creator).orEmpty()
                     val line = listOf(who, if (c.sub != who) c.sub else "").filter { it.isNotBlank() }.joinToString(" · ")
                     if (line.isNotBlank()) Text(line.uppercase(), color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.4.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.padding(top = 2.dp))

@@ -203,7 +203,7 @@ fun ProfileScreen(
                     val ob = androidx.lifecycle.LifecycleEventObserver { _, ev -> if (ev == androidx.lifecycle.Lifecycle.Event.ON_RESUME) sobre = Actualizador.puedeReabrirSola(actx) }
                     vida.addObserver(ob); onDispose { vida.removeObserver(ob) }
                 }
-                Text(if (sobre) "Tras actualizar, Atrio se vuelve a abrir sola" else "Tras actualizar, Atrio se cierra y te avisa para abrirla. Para que se reabra sola hace falta el permiso «Mostrar sobre otras apps»",
+                Text(if (sobre) "Tras actualizar, Azabache se vuelve a abrir sola" else "Tras actualizar, Azabache se cierra y te avisa para abrirla. Para que se reabra sola hace falta el permiso «Mostrar sobre otras apps»",
                     color = Muted, fontSize = 12.sp, lineHeight = 16.sp)
                 if (!sobre) androidx.compose.material3.TextButton({
                     runCatching { actx.startActivity(android.content.Intent(android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION, android.net.Uri.parse("package:${actx.packageName}")).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)) }
@@ -242,7 +242,7 @@ fun ProfileScreen(
         // (las claves, importar, Drive y las copias están en la pestaña «Servicios y copias»)
         Spacer(Modifier.height(20.dp))
         val ver = remember { try { ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionName } catch (e: Exception) { null } ?: "" }
-        Text("Atrio $ver", color = Muted, fontSize = 12.sp, modifier = Modifier.fillMaxWidth().padding(4.dp))
+        Text("Azabache $ver", color = Muted, fontSize = 12.sp, modifier = Modifier.fillMaxWidth().padding(4.dp))
     }
 }
 

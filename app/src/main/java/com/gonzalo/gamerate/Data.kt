@@ -71,19 +71,19 @@ fun isWebId(id: Long) = id in 1 until 100_000_000_000L
 val GAMES = Kind(
     0, "Videojuegos",
     listOf("Valoración", "Gráficos", "Historia", "Música", "Jugabilidad"),
-    listOf("En lista", "Jugando", "Dropeado"), false
+    listOf("Pendiente", "Jugando", "Abandonado"), false
 )
 
 val BOOKS = Kind(
     1, "Libros",
     listOf("Valoración", "Personajes", "Historia", "Escritura", "Ritmo"),
-    listOf("En lista", "Leyendo", "Abandonado"), true
+    listOf("Pendiente", "Leyendo", "Abandonado"), true
 )
 
 /** Crea una categoría propia. criteria: lo que se valora (1 a 4); progress: palabra para "en curso"; source: buscador. */
 fun customKind(id: Int, title: String, criteria: List<String>, progress: String, color: Int, source: String = "") = Kind(
     id, title.trim(), listOf("Valoración") + criteria.map { it.trim() }.filter { it.isNotEmpty() }.take(4).ifEmpty { listOf("Disfrute") },
-    listOf("En lista", progress.trim().ifEmpty { "En curso" }, "Abandonado"), false, true, color,
+    listOf("Pendiente", progress.trim().ifEmpty { "En curso" }, "Abandonado"), false, true, color,
     source.takeIf { it == SRC_MOVIE || it == SRC_TV } ?: ""
 )
 

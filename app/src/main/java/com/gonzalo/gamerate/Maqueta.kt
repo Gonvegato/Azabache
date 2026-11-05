@@ -167,14 +167,14 @@ object MagLayouts {
 
     /** Casillas nuevas de esta versión (p. ej. «subrayados»): a las maquetas ya guardadas se les añade una vez,
      *  en su propia fila detrás de [after]; si luego la quitas, no vuelve. */
-    fun withNew(ctx: Context, key: String, rows: List<MagRowSpec>, mod: String, after: String): List<MagRowSpec> {
+    fun withNew(ctx: Context, key: String, rows: List<MagRowSpec>, mod: String, after: String, primera: Boolean = false): List<MagRowSpec> {
         val flag = "nuevo:$mod:$key"
         val p = prefs(ctx)
         if (p.getBoolean(flag, false)) return rows
         p.edit().putBoolean(flag, true).apply()
         if (rows.any { r -> r.cells.any { it.type == mod } }) return rows
-        val i = rows.indexOfFirst { r -> r.cells.any { it.type == after } }
-        val out = rows.toMutableList().apply { add(if (i >= 0) i + 1 else size, MagRowSpec(listOf(MagCell(mod)))) }
+        val i = if (primera) -1 else rows.indexOfFirst { r -> r.cells.any { it.type == after } }
+        val out = rows.toMutableList().apply { add(if (primera) 0 else if (i >= 0) i + 1 else size, MagRowSpec(listOf(MagCell(mod)))) }
         save(ctx, key, out)
         return out
     }
@@ -228,6 +228,8 @@ fun MagPage(
             if ("donde" in defs) r = MagLayouts.withNew(ctx, key, r, "donde", "critica")
             // (Atrio 6.64: «En tu diario», detrás de los apuntes o de la opinión, la primera vez que hay algo escrito)
             if ("diario" in defs) r = MagLayouts.withNew(ctx, key, r, "diario", if (r.any { row -> row.cells.any { it.type == "apuntes" } }) "apuntes" else "opinion")
+            // (Azabache 1.2: la portada, la misma que en Hiedra y Marfil, como primera fila; si ya la pusiste tú, no se repite)
+            if ("portada" in defs) r = MagLayouts.withNew(ctx, key, r, "portada", "", primera = true)
             r
         } ?: defaults)
     }
