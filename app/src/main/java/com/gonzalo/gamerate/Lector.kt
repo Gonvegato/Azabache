@@ -992,8 +992,8 @@ fun fmtFin(d: java.time.LocalDate, hoy: java.time.LocalDate = java.time.LocalDat
 }
 
 /**
- * El atajo del icono de la app (mantenerlo pulsado): «Seguir leyendo» el último libro que has abierto, directo a tu
- * página. Se pone al cerrar el lector y al abrir la app; si ya lo acabaste o quitaste su archivo, se quita.
+ * El atajo del icono de la app (mantenerlo pulsado): «Seguir leyendo» el último libro que leíste en Marfil; abre Marfil en su ficha.
+ * Se pone al abrir la app; si ya lo acabaste, o Marfil no está en el móvil, se quita.
  */
 object AtajoLectura {
     private const val ID = "seguir_leyendo"
@@ -1002,9 +1002,9 @@ object AtajoLectura {
         val u = LecturaAviso.ultimo(ctx)
         val st = Store(ctx)
         val nombre = u?.let { (id, _) -> st.loadPlays(BOOKS.id).find { it.id == id }?.name ?: st.load(BOOKS.id).find { it.id == id }?.name }
-        if (u == null || nombre == null) { sm.removeDynamicShortcuts(listOf(ID)); return@runCatching }
-        val intent = Intent(ctx, MainActivity::class.java).setAction(Intent.ACTION_VIEW)
-            .putExtra("leer", u.first).putExtra("leer_nombre", nombre).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        val marfil = ctx.packageManager.getLaunchIntentForPackage(Hermanas.PAQ_MARFIL)
+        if (u == null || nombre == null || marfil == null) { sm.removeDynamicShortcuts(listOf(ID)); return@runCatching }
+        val intent = marfil.also { i -> Hermanas.enHermana(ctx, "marfil", u.first)?.let { i.putExtra("clave", it) } }
         val corto = if (nombre.length > 22) nombre.take(21).trimEnd() + "…" else nombre
         val sc = android.content.pm.ShortcutInfo.Builder(ctx, ID)
             .setShortLabel(corto)

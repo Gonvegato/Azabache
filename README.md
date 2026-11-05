@@ -9,6 +9,12 @@ Hermana de [Hiedra](https://github.com/Gonvegato/hiedra) (juegos), [Marfil](http
 y aquí aparecen solos, con su estado, sus horas y sus portadas, para valorarlos. Las películas, las series y tus categorías propias siguen
 aquí tal cual (con su «Añadir»).
 
+## 1.2.6
+
+- El aviso del objetivo de lectura y el atajo «Seguir leyendo» del icono proponen el último libro que leíste en Marfil (según lo que
+  Marfil sube) y abren Marfil en su ficha. Antes miraban el lector antiguo (que ya no existe): el atajo abría Azabache sin más y el
+  aviso no sabía qué libro proponer.
+
 ## 1.2.5
 
 - Textos al día: los avisos del actualizador y el de «se ha actualizado» dicen Azabache (decían Atrio), y las ayudas que mandaban a

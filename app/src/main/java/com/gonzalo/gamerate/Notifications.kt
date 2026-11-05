@@ -134,20 +134,20 @@ object LecturaAviso {
     /** Lo leído hoy (ms, todos tus libros). */
     fun hoy(ctx: Context): Long = Hermanas.leidoPorDia(ctx)[LocalDate.now().toEpochDay()]?.values?.sum() ?: 0L
 
-    /** El libro que leíste por última vez (y que tiene su archivo aquí): id y lo que llevas (0–1). */
-    fun ultimo(ctx: Context): Pair<Long, Double>? {
-        val p = ctx.getSharedPreferences("lector", Context.MODE_PRIVATE)
-        var best: Triple<Long, Long, Double>? = null
-        for ((k, v) in p.all) {
-            val id = k.toLongOrNull() ?: continue
-            val o = runCatching { org.json.JSONObject(v as String) }.getOrNull() ?: continue
-            if (o.optString("uri").isBlank()) continue
-            val fr = o.optDouble("fraction", 0.0)
-            if (fr >= 0.995) continue
-            val t = o.optLong("read", 0L)
-            if (best == null || t > best.second) best = Triple(id, t, fr)
+    /**
+     * El libro que leíste por última vez según lo que Marfil sube (el día más reciente con lectura; si hubo varios, el que más rato):
+     * id de su ficha aquí y lo que llevas (0–1; Marfil no sube la fracción en el nodo ligero, así que va a 0 y no se enseña). Un libro
+     * que aquí ya consta como terminado no se propone.
+     */
+    fun ultimo(ctx: Context): Pair<Long, Double>? = ultimoDe(Hermanas.leidoPorDia(ctx), Store(ctx).load(BOOKS.id).map { it.id }.toSet())?.let { it to 0.0 }
+
+    /** [dias]: día → (ficha → ms leídos); [terminados]: fichas ya valoradas (no se proponen). Sin móvil: se prueba. */
+    fun ultimoDe(dias: Map<Long, Map<Long, Long>>, terminados: Set<Long>): Long? {
+        for (dia in dias.keys.sortedDescending()) {
+            val id = dias[dia]!!.filter { (id, ms) -> ms > 0 && id !in terminados }.maxByOrNull { it.value }?.key ?: continue
+            return id
         }
-        return best?.let { it.first to it.third }
+        return null
     }
 
     /** El aviso, si aún no has cumplido el objetivo de hoy (si ya lo cumpliste, nada). */
@@ -161,7 +161,9 @@ object LecturaAviso {
         nm.createNotificationChannel(NotificationChannel("lectura", "Objetivo de lectura", NotificationManager.IMPORTANCE_DEFAULT))
         val u = ultimo(ctx)
         val nombre = u?.let { (id, _) -> st.loadPlays(BOOKS.id).find { it.id == id }?.name ?: st.load(BOOKS.id).find { it.id == id }?.name }
+        // Tocar el aviso abre Marfil en la ficha de ese libro (si está en el móvil); si no, Azabache
         val intent = ctx.packageManager.getLaunchIntentForPackage(Hermanas.PAQ_MARFIL)?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            ?.also { i -> u?.first?.let { id -> Hermanas.enHermana(ctx, "marfil", id)?.let { i.putExtra("clave", it) } } }
             ?: Intent(ctx, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         val pi = PendingIntent.getActivity(ctx, 2003, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val titulo = if (min < 1) "Hoy aún no has leído" else "Hoy llevas $min de $meta min de lectura"

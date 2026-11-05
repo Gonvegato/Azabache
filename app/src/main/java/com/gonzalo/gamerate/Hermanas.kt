@@ -511,7 +511,7 @@ object Hermanas {
         }
         prefs(c).edit().putLong("ultima", ahora).apply()
         // Lo que llega de las hermanas (horas, subrayados, portadas) también se ve en los widgets al momento
-        if (cambio) { enPantalla { version++ }; Widgets.pedir(c) }
+        if (cambio) { enPantalla { version++ }; Widgets.pedir(c); AtajoLectura.pon(c) }
         return cambio
     }
 }
