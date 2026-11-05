@@ -141,7 +141,7 @@ fun ProfileScreen(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text("Lectura al día", fontWeight = FontWeight.Medium)
-                    Text(if (meta > 0) "minutos con el lector" else "sin objetivo", color = Muted, fontSize = 12.sp)
+                    Text(if (meta > 0) "minutos leyendo en Marfil" else "sin objetivo", color = Muted, fontSize = 12.sp)
                 }
                 Stepper(meta, " min", { ponMeta(meta - 5) }, { ponMeta(meta + 5) })
             }

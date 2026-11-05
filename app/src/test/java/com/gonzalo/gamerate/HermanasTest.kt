@@ -82,6 +82,13 @@ class HermanasTest {
         JSONObject().put("k", k).put("t", t).put("a", a).put("e", e).put("mod", mod).put("msp", msp).put("an", 1_700_000_000_000L).put("ul", 1_700_000_000_000L).put("pg", pg).put("fr", 0.5).put("tm", JSONArray(tm)).put("pu", pu)
     private fun blobM(vararg ls: JSONObject) = JSONObject().put("v", 1).put("libros", JSONArray().also { x -> ls.forEach { x.put(it) } }).put("borrados", JSONObject())
 
+    @Test fun elAvanceDeCadaLibroVaPorFicha() {
+        // Dune va por la mitad (fr 0,5) y tiene ficha 7; Nada no tiene ficha: no sale
+        val libros = Hermanas.librosDe(mapOf("A" to blobM(libroM("libro:dune:herbert", "Dune", "Frank Herbert", "LEYENDO"), libroM("libro:nada:laforet", "Nada", "Carmen Laforet"))))
+        val av = Hermanas.avancePorFicha(libros, mapOf("libro:dune:herbert" to 7L))
+        assertEquals(1, av.length()); assertEquals(0.5, av.optDouble("7"), 0.001)
+    }
+
     @Test fun losLibrosDeMarfilSonFichasDeLibros() {
         val enl = HashMap<String, Long>()
         val libros = Hermanas.librosDe(mapOf("A" to blobM(libroM("libro:dune:herbert", "Dune", "Frank Herbert", "LEYENDO", msp = 120 * 60_000L, pg = 700), libroM("libro:nada:laforet", "Nada", "Carmen Laforet", "LEIDO", tm = listOf(1_700_000_000_000L)))))

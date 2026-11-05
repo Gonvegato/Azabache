@@ -136,10 +136,10 @@ object LecturaAviso {
 
     /**
      * El libro que leíste por última vez según lo que Marfil sube (el día más reciente con lectura; si hubo varios, el que más rato):
-     * id de su ficha aquí y lo que llevas (0–1; Marfil no sube la fracción en el nodo ligero, así que va a 0 y no se enseña). Un libro
-     * que aquí ya consta como terminado no se propone.
+     * id de su ficha aquí y lo que llevas (0–1, lo que Marfil subió con su biblioteca; 0 si no se sabe). Un libro que aquí ya consta
+     * como terminado no se propone.
      */
-    fun ultimo(ctx: Context): Pair<Long, Double>? = ultimoDe(Hermanas.leidoPorDia(ctx), Store(ctx).load(BOOKS.id).map { it.id }.toSet())?.let { it to 0.0 }
+    fun ultimo(ctx: Context): Pair<Long, Double>? = ultimoDe(Hermanas.leidoPorDia(ctx), Store(ctx).load(BOOKS.id).map { it.id }.toSet())?.let { it to (Hermanas.avanceMarfil(ctx, it)?.toDouble() ?: 0.0) }
 
     /** [dias]: día → (ficha → ms leídos); [terminados]: fichas ya valoradas (no se proponen). Sin móvil: se prueba. */
     fun ultimoDe(dias: Map<Long, Map<Long, Long>>, terminados: Set<Long>): Long? {

@@ -356,6 +356,11 @@ object Hermanas {
         return o.keys().asSequence().associateWithTo(HashMap()) { o.optLong(it) }
     }
     private fun guardaEnlaces(c: Context, app: String, m: Map<String, Long>) = guarda(c, "enl_$app", JSONObject().also { o -> m.forEach { (k, v) -> o.put(k, v) } }.toString())
+    /** Lo que llevas de cada libro (0–1), por ficha de aquí (solo los que tienen ficha y algo leído). Sin móvil: se prueba. */
+    fun avancePorFicha(libros: List<LibroM>, enl: Map<String, Long>): JSONObject =
+        JSONObject().also { o -> libros.forEach { l -> enl[l.clave]?.let { id -> if (l.fraccion > 0f) o.put(id.toString(), l.fraccion.toDouble()) } } }
+    /** Lo que llevas leído de un libro de Marfil (0–1), por ficha de aquí; null si no se sabe. */
+    fun avanceMarfil(c: Context, id: Long): Float? = lee(c, "avance_marfil")?.optDouble(id.toString(), -1.0)?.takeIf { it >= 0.0 }?.toFloat()
     /** Al revés: la ficha de aquí → el id del juego en Hiedra (o la clave del libro en Marfil), si la ficha vino de allí. */
     fun enHermana(c: Context, app: String, id: Long): String? = enlaces(c, app).entries.firstOrNull { it.value == id }?.key
     /** «Jugar»: Hiedra, en la ficha de ese juego si es suyo. */
@@ -498,6 +503,9 @@ object Hermanas {
                 val enl = enlaces(c, "marfil"); val pu = puestas(c, "marfil")
                 val e = reflejarLibros(libros, store.load(BOOKS.id), store.loadPlays(BOOKS.id), enl, { l -> portadaLibro(c, l, portadas) }, pu, ahora)
                 if (e.cambio) { store.save(e.games, BOOKS.id); store.savePlays(e.plays, BOOKS.id); guardaEnlaces(c, "marfil", enl); guardaPuestas(c, "marfil", pu); cambio = true }
+                // Lo que llevas de cada libro (0–1), por ficha: el widget «Leyendo» y el aviso de lectura lo enseñan
+                val av = avancePorFicha(libros, enl).toString()
+                if (av != prefs(c).getString("avance_marfil", "")) { guarda(c, "avance_marfil", av); cambio = true }
                 nodo("marfil/tiempo")?.let { guarda(c, "tiempo_marfil", it.toString()); cambio = true }
                 // Los subrayados (ligeros): la cita de la portada, el Diario, el buscador y el widget
                 val sub = nodo("marfil/subrayados")?.toString() ?: "{}"

@@ -9,6 +9,13 @@ Hermana de [Hiedra](https://github.com/Gonvegato/hiedra) (juegos), [Marfil](http
 y aquí aparecen solos, con su estado, sus horas y sus portadas, para valorarlos. Las películas, las series y tus categorías propias siguen
 aquí tal cual (con su «Añadir»).
 
+## 1.2.7
+
+- El widget «Leyendo»: un libro de Marfil se abre en Marfil («Leer en Marfil →») y enseña lo que llevas (lo que Marfil sube con su
+  biblioteca); antes abría su ficha aquí y no sabía el avance. Sin nada en la mesilla, manda a Marfil (los libros se empiezan allí).
+- El aviso del objetivo de lectura dice también por dónde vas («vas por el 43 %»).
+- Dos textos que seguían hablando del lector antiguo («minutos con el lector», «subraya en el lector») dicen ahora Marfil.
+
 ## 1.2.6
 
 - El aviso del objetivo de lectura y el atajo «Seguir leyendo» del icono proponen el último libro que leíste en Marfil (según lo que

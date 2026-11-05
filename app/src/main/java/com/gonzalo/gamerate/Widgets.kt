@@ -273,10 +273,14 @@ class WDatos(val ctx: Context) {
     fun reciente(e: ShellEntry): Long = max(e.activity, if (e.kind.isBook) BookFiles.state(ctx, e.id).optLong("read", 0L) else 0L)
     fun enCurso(): List<ShellEntry> = todas.filter { it.play?.status == 1 }.sortedByDescending { reciente(it) }
     fun conArchivo(e: ShellEntry) = e.kind.isBook && BookFiles.get(ctx, e.id) != null
+    /** Un libro que vino de Marfil, con Marfil en el móvil: se lee allí (y su avance es el que Marfil sube). */
+    fun conMarfil(e: ShellEntry) = e.kind.isBook && marfil && Hermanas.enHermana(ctx, "marfil", e.id) != null
+    val marfil: Boolean by lazy { Hermanas.instalada(ctx, Hermanas.PAQ_MARFIL) }
 
     /** Lo leído o jugado (0–1), si se sabe. */
     fun avance(e: ShellEntry): Float? {
         if (conArchivo(e)) return BookFiles.progress(ctx, e.id)
+        if (e.kind.isBook) Hermanas.avanceMarfil(ctx, e.id)?.let { return it }
         return e.play?.percent()?.let { it / 100f }
     }
 
@@ -467,14 +471,14 @@ object Widgets {
 
     /** Abre Marfil (el lector es suyo); si no está, la ficha del libro aquí. */
     fun leer(ctx: Context, id: Long, nombre: String, goto: String? = null): PendingIntent {
-        val i = ctx.packageManager.getLaunchIntentForPackage(Hermanas.PAQ_MARFIL)?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)?.also { m -> Hermanas.enHermana(ctx, "marfil", id)?.let { m.putExtra("clave", it) } }
+        val i = ctx.packageManager.getLaunchIntentForPackage(Hermanas.PAQ_MARFIL)?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)?.also { m -> if (id != 0L) Hermanas.enHermana(ctx, "marfil", id)?.let { m.putExtra("clave", it) } }
             ?: Intent(ctx, MainActivity::class.java).setAction(Intent.ACTION_VIEW).setData(Uri.parse("atrio://ficha/$id")).putExtra("play_id", id).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         return PendingIntent.getActivity(ctx, 0, i, PI)
     }
 
     /** Un libro con archivo se abre para leerlo; lo demás, en su ficha. */
     fun tocar(d: WDatos, e: ShellEntry): PendingIntent =
-        if (d.conArchivo(e)) leer(d.ctx, e.id, e.name) else abrir(d.ctx, "item:${e.kind.id}:${e.id}")
+        if (d.conArchivo(e) || d.conMarfil(e)) leer(d.ctx, e.id, e.name) else abrir(d.ctx, "item:${e.kind.id}:${e.id}")
 
     // ------------------------------------------------------------------ imágenes
 
@@ -507,14 +511,16 @@ object Widgets {
     private suspend fun leyendo(d: WDatos, id: Int, w: Float, h: Float): Pagina {
         val ctx = d.ctx
         val libros = d.kinds.filter { it.isBook }.flatMap { d.de(it) }.filter { it.play?.status == 1 }.sortedByDescending { d.reciente(it) }
-        if (libros.isEmpty()) return vacio(ctx, "Leyendo", "Nada en la mesilla", "Empieza un libro y lo tendrás aquí, a un toque de seguir leyendo.", abrir(ctx, "add_book"), w, h)
+        if (libros.isEmpty()) return vacio(ctx, "Leyendo", "Nada en la mesilla",
+            if (d.marfil) "Empieza un libro en Marfil y lo tendrás aquí, a un toque de seguir leyendo." else "Los libros se leen en Marfil: empieza uno allí y lo tendrás aquí.",
+            if (d.marfil) leer(ctx, 0L, "") else abrir(ctx, "home"), w, h)
         val i = Math.floorMod(estado(ctx, id, "i", 0), libros.size)
         val e = libros[i]
         val compacto = w < 200f && h < 200f
         val img = imagen(ctx, e.cover, px(ctx, if (compacto) max(w, h) else h * 0.9f))
         val av = d.avance(e)
-        val archivo = d.conArchivo(e)
-        val accion = if (archivo) "Leer \u00A0→" else "Abrir ficha \u00A0→"
+        val archivo = d.conArchivo(e) || d.conMarfil(e)
+        val accion = if (d.conMarfil(e)) "Leer en Marfil \u00A0→" else if (archivo) "Leer \u00A0→" else "Abrir ficha \u00A0→"
         val zonas = mutableListOf(Zona(0f, 0f, w, h, tocar(d, e), (if (archivo) "Seguir leyendo " else "Abrir ") + e.name))
         if (libros.size > 1) zonas += Zona(w - 72f, 0f, 72f, 42f, op(ctx, WTipo.LEYENDO, id, "sig"), "Otro libro")
         return Pagina(zonas) {
@@ -871,7 +877,7 @@ object Widgets {
     private fun cita(d: WDatos, id: Int, w: Float, h: Float): Pagina {
         val ctx = d.ctx
         val todas = citas(ctx, d.kinds.filter { it.isBook }.flatMap { d.de(it) })
-        if (todas.isEmpty()) return vacio(ctx, "La cita", "Subraya y saldrá aquí", "Las frases que subrayes en el lector se irán turnando aquí, una cada día.", abrir(ctx, "diario:1"), w, h)
+        if (todas.isEmpty()) return vacio(ctx, "La cita", "Subraya y saldrá aquí", "Las frases que subrayes en Marfil se irán turnando aquí, una cada día.", abrir(ctx, "diario:1"), w, h)
         // Una distinta cada día (y la que quieras tocando «Otra»)
         val i = Math.floorMod(LocalDate.now().toEpochDay() + estado(ctx, id, "i", 0), todas.size.toLong()).toInt()
         val q = todas[i]
