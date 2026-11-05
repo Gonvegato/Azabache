@@ -271,4 +271,15 @@ open class SagasTest {
 }
 
 @Config(sdk = [34], qualifiers = "w1260dp-h840dp-land-xhdpi")
-class SagasOppoHorizontalTest : SagasTest() { override val prefijo get() = "oppo_h_" }
+class SagasOppoHorizontalTest : SagasTest() { override val prefijo get() = "oppo_h_" 
+    /** El objetivo de libros cuenta todo lo terminado este año: lo valorado y lo que no, esté o no en una saga. */
+    @Test fun elObjetivoCuentaLosLibrosDeLasSagasAunqueNoTenganNota() {
+        val ano = java.time.LocalDate.now().year
+        val dia = java.time.LocalDate.of(ano, 3, 1).toEpochDay()
+        val libros = listOf(
+            Game(1, "Mistborn 1", "", 90, end = dia), Game(2, "Mistborn 2", "", 0, end = dia + 5), Game(3, "Mistborn 3", "", 0, end = dia + 9),
+            Game(4, "Suelto", "", 0, end = dia + 1), Game(5, "De otro año", "", 80, end = java.time.LocalDate.of(ano - 1, 5, 1).toEpochDay()),
+            Game(2, "Mistborn 2", "", 0, end = dia + 5))
+        assertEquals(4, terminadosEn(libros, ano))
+    }
+}

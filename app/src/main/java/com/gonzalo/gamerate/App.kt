@@ -1196,6 +1196,7 @@ private fun AppContenido(
                     },
                     if (kind.isBook) (partner?.goalBooks ?: 0) else (partner?.goalGames ?: 0),
                     onShareYear = if (pv) null else ({ y -> shareYear(kind, myGames, y) }),
+                    terminados = myGames,
                     kinds = if (shellLib) emptyList() else if (pv) partner!!.allKinds else myKinds,
                     onKind = { k -> if (k.isMovie || k.isTv) cineTv = k.isTv; section = k.id },
                     onSpecial = { y -> especialYear = y }

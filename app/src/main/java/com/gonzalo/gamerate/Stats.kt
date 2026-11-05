@@ -216,7 +216,10 @@ private fun nameScore(g: Game?): String = if (g == null) "—" else g.name + " (
 fun StatsScreen(
     kind: Kind, games: List<Game>, plays: List<Play>, partner: PartnerSide?,
     goal: Int, partnerGoal: Int, onShareYear: ((Int) -> Unit)? = null,
-    kinds: List<Kind> = emptyList(), onKind: (Kind) -> Unit = {}, onSpecial: ((Int) -> Unit)? = null, onMenu: () -> Unit
+    kinds: List<Kind> = emptyList(), onKind: (Kind) -> Unit = {}, onSpecial: ((Int) -> Unit)? = null,
+    /** Todo lo terminado, también lo que aún no has valorado (las cifras usan [games], que solo trae lo valorado; el objetivo cuenta todo). */
+    terminados: List<Game> = games,
+    onMenu: () -> Unit
 ) {
     val showPartner = Mode.calP
     val useP = showPartner && partner != null
@@ -230,7 +233,8 @@ fun StatsScreen(
     var year by remember { mutableStateOf<Int?>(null) }
     val st = remember(g, p, year) { compute(g, p, year) }
     val cmp = remember(games, partner) { if (partner == null) null else compare(games, partner.games) }
-    val doneThisYear = remember(g) { g.count { it.end > 0L && yearOf(it.end) == thisYear } }
+    // El objetivo cuenta todo lo que terminaste este año, lo hayas valorado o no (un libro leído en Marfil cuenta aunque no tenga nota)
+    val doneThisYear = remember(g, terminados) { terminadosEn(if (useP) g else terminados, thisYear) }
     val goalNow = if (useP) partnerGoal else goal
 
     val creatorWord = kind.creatorWord
@@ -524,3 +528,6 @@ private fun TiempoLeyendoSection(year: Int?, games: List<Game>, plays: List<Play
         }
     }
 }
+
+/** Cuántos terminaste en [ano] (cada ficha una vez), estén valorados o no y estén o no en una saga. Pura (se prueba). */
+fun terminadosEn(games: List<Game>, ano: Int): Int = games.distinctBy { it.id }.count { it.end > 0L && yearOf(it.end) == ano }

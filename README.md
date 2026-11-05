@@ -9,6 +9,12 @@ Hermana de [Hiedra](https://github.com/Gonvegato/hiedra) (juegos), [Marfil](http
 y aquí aparecen solos, con su estado, sus horas y sus portadas, para valorarlos. Las películas, las series y tus categorías propias siguen
 aquí tal cual (con su «Añadir»).
 
+## 1.2.11
+
+- **Arreglo del objetivo de libros (y de juegos)**: contaba solo lo que habías valorado en Azabache. Un libro leído en Marfil que aún no
+  tiene nota (lo normal en los de una saga, que se leen seguidos) no contaba. Ahora cuenta todo lo que terminaste este año, con nota o sin
+  ella, esté o no en una saga. Las demás cifras de Estadísticas (medias, géneros…) siguen usando solo lo valorado.
+
 ## 1.2.10
 
 - **Una sola definición de «días seguidos»**, la misma regla en Hiedra, Marfil, Cobalto y Azabache (`Racha.kt`, con las mismas pruebas en las cuatro, y en el contrato): cuenta un día en que leíste o jugaste al menos un minuto, o escribiste al menos una palabra (en Marfil, Hiedra y Cobalto; basta con una); si hoy aún no, desde ayer.
