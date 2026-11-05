@@ -56,7 +56,7 @@ class EstadoTest {
         rule.setContent { MaterialTheme(colorScheme = appColors(), typography = AppTypography) { Surface(Modifier.fillMaxSize(), color = Paper) { App(s, 0L, false, "") {} } } }
         rule.waitForIdle()
         rule.onAllNodesWithText("Libros", ignoreCase = true)[0].performClick(); rule.waitForIdle()
-        rule.onAllNodesWithText("Pendiente", ignoreCase = true)[0].performClick(); rule.waitForIdle()
+        rule.onAllNodesWithText("Pendientes", ignoreCase = true)[0].performClick(); rule.waitForIdle()
         rule.onAllNodesWithText("Proyecto Hail Mary", ignoreCase = true)[0].performClick(); rule.waitForIdle()
         com.github.takahirom.roborazzi.captureScreenRoboImage("build/outputs/roborazzi/estado_1_ficha.png")
         rule.onAllNodesWithText("EDITAR", ignoreCase = true)[0].performClick(); rule.waitForIdle()
@@ -88,7 +88,7 @@ class EstadoTest {
         rule.setContent { MaterialTheme(colorScheme = appColors(), typography = AppTypography) { Surface(Modifier.fillMaxSize(), color = Paper) { App(s, 0L, false, "") {} } } }
         rule.waitForIdle()
         rule.onAllNodesWithText("Libros", ignoreCase = true)[0].performClick(); rule.waitForIdle()
-        rule.onAllNodesWithText("Pendiente", ignoreCase = true)[0].performClick(); rule.waitForIdle()
+        rule.onAllNodesWithText("Pendientes", ignoreCase = true)[0].performClick(); rule.waitForIdle()
         rule.onAllNodesWithText("Klara y el Sol", ignoreCase = true)[0].performClick(); rule.waitForIdle()
         rule.onAllNodesWithText("EDITAR", ignoreCase = true)[0].performClick(); rule.waitForIdle()
         rule.onAllNodesWithText("DATOS Y NOTA", substring = true)[0].performClick(); rule.waitForIdle()

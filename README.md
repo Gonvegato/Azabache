@@ -9,6 +9,17 @@ Hermana de [Hiedra](https://github.com/Gonvegato/hiedra) (juegos), [Marfil](http
 y aquí aparecen solos, con su estado, sus horas y sus portadas, para valorarlos. Las películas, las series y tus categorías propias siguen
 aquí tal cual (con su «Añadir»).
 
+## 1.2.8
+
+- La fila de orden y filtros (Recientes · Nombre · …) lleva el mismo degradado en los bordes que las pestañas.
+- En las casillas estrechas de la ficha, un dato que no cabe en una línea («Terminado · 06/09/2026») pone la etiqueta entera arriba y la
+  cifra debajo, en vez de cortar la etiqueta («Termin…»).
+- Las pestañas de la biblioteca van en plural, como en Hiedra y Marfil (Jugando · Pendientes · Pasados · Abandonados); el estado de cada
+  ficha sigue en singular.
+- Las pestañas (secciones, Ajustes) se desplazan solas solo cuando la elegida no se ve entera, y entonces la centran: antes se
+  pegaba al borde izquierdo y la de al lado salía cortada.
+  Y en los bordes, un degradado cuando hay más pestañas por ese lado.
+
 ## 1.2.7
 
 - El widget «Leyendo»: un libro de Marfil se abre en Marfil («Leer en Marfil →») y enseña lo que llevas (lo que Marfil sube con su

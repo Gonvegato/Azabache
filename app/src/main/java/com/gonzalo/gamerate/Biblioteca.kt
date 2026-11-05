@@ -100,7 +100,8 @@ fun LibraryScreen(
     // Libros: agrupados en sagas por defecto (en «En lista» y en los valorados)
     var grouped by remember(kind.id) { mutableStateOf(LibPrefs.grouped) }
     val canGroup = kind.isBook && sagas != null && sagas.isNotEmpty() && (segment == 1 || segment == 2) && query.isBlank()
-    val labels = listOf(kind.statuses[1], kind.statuses[0], kind.doneWord, kind.statuses[2]) + if (sagas != null) listOf("Sagas") else emptyList()
+    // Las pestañas son listas, en plural («Pendientes», «Abandonados»), como en Hiedra y Marfil; el estado de cada ficha sigue en singular
+    val labels = listOf(kind.statuses[1], enPlural(kind.statuses[0]), kind.doneWord, enPlural(kind.statuses[2])) + if (sagas != null) listOf("Sagas") else emptyList()
     val counts = listOf(plays.count { it.status == 1 }, plays.count { it.status == 0 }, games.size, plays.count { it.status == 2 }) + if (sagas != null) listOf(sagas.size) else emptyList()
     val cells: List<Cell> = remember(kind.id, games, plays, segment, query, sort, favOnly, grouped, sagas) {
         val raw = when (segment) {
@@ -345,4 +346,11 @@ internal fun ListCover(url: String, name: String, w: androidx.compose.ui.unit.Dp
         if (url.isNotBlank()) coil.compose.AsyncImage(url, name, Modifier.fillMaxSize(), contentScale = androidx.compose.ui.layout.ContentScale.Crop, colorFilter = Ediciones.filtro)
         else Text(name.take(1).uppercase(), fontFamily = Display, fontWeight = FontWeight.Bold, fontSize = 30.sp, color = Muted)
     }
+}
+
+/** «Pendiente» → «Pendientes», «Abandonado» → «Abandonados»; lo que ya acaba en s (o es otra cosa) se deja. Sin móvil: se prueba. */
+fun enPlural(estado: String): String = when {
+    estado.isBlank() || estado.endsWith("s") -> estado
+    estado.endsWith("a") || estado.endsWith("e") || estado.endsWith("o") -> estado + "s"
+    else -> estado
 }
