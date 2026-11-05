@@ -78,6 +78,20 @@ abstract class WBase(private val tipo: WTipo) : AppWidgetProvider() {
     }
 }
 
+/**
+ * Con Marfil en el móvil, «Leyendo» y «La cita» son los de Marfil (los mismos libros y subrayados): los de Azabache se apagan para no tener
+ * dos iguales en el selector de widgets. Si quitas Marfil, vuelven. Se mira cada vez que se abre Azabache.
+ */
+fun ocultarWidgetsDeMarfil(ctx: Context) {
+    val marfil = Hermanas.instalada(ctx, Hermanas.PAQ_MARFIL)
+    val pm = ctx.packageManager
+    for (c in listOf(WLeyendo::class.java, WCita::class.java)) runCatching {
+        val cn = android.content.ComponentName(ctx, c)
+        val quiero = if (marfil) android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED else android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DEFAULT
+        if (pm.getComponentEnabledSetting(cn) != quiero) pm.setComponentEnabledSetting(cn, quiero, android.content.pm.PackageManager.DONT_KILL_APP)
+    }
+}
+
 class WLeyendo : WBase(WTipo.LEYENDO)
 class WEstante : WBase(WTipo.ESTANTE)
 class WCalendario : WBase(WTipo.CALENDARIO)

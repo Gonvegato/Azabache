@@ -132,6 +132,8 @@ private fun AppContenido(
     var wheelOpen by remember { mutableStateOf(false) }
     var partner by remember { mutableStateOf(Couple.cached(store)) }
     var screen by remember { mutableStateOf<Screen>(Screen.Home) }
+    // Desde Apariencia, las otras pestañas de Ajustes
+    LaunchedEffect(AjustesNav.ir) { AjustesNav.ir?.let { screen = it; AjustesNav.ir = null } }
     // El número especial abierto desde Estadísticas (el año), encima de todo
     var especialYear by remember { mutableStateOf<Int?>(null) }
     var syncTick by remember { mutableStateOf(0) }
@@ -1248,7 +1250,7 @@ private fun AppContenido(
                             undoImport = store.hasUndoImport
                         }
                     },
-                    pestanas = { PestanasAjustes(0) { screen = it } },
+                    pestanas = { PestanasAjustes(1) { screen = it } },
                     categorias = {
                         Text("Tus categorías", fontWeight = FontWeight.Bold, fontSize = 24.sp, fontFamily = Display)
                         Text("Además de juegos, libros, pelis y series: discos, viajes, restaurantes… Salen en el menú de la portada.", color = Muted, fontSize = 13.sp)
@@ -1297,7 +1299,7 @@ private fun AppContenido(
                     onMassScores = { screen = Screen.MassScore(Screen.Settings) },
                     steamKey = store.steamKey, steamUser = store.steamUser,
                     onSteam = { k, u -> steamHours(k, u) },
-                    pestanas = { PestanasAjustes(1) { screen = it } }
+                    pestanas = { PestanasAjustes(2) { screen = it } }
                 ) { screen = Screen.Home }
 
                 is Screen.Search -> if (s.manual || (kind.custom && !kind.online)) CustomAddScreen(

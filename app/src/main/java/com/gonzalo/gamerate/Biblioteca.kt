@@ -289,8 +289,11 @@ private fun RevistaLibrary(l: LibUi) {
                 TextLink("CIFRAS", onClick = l.onStats)
                 if (l.onAdd != null && !l.readOnly) TextLink("+ AÑADIR", ColGeneral) { l.onAdd.invoke(l.segment != 2) }
             }
-            if (l.titleSwitch != null) Box(Modifier.padding(top = 8.dp)) { l.titleSwitch.invoke() }
-            else FitTitle(l.kind.title, 52.sp, 54.sp, letterSpacing = (-1.5).sp, modifier = Modifier.fillMaxWidth().padding(top = 8.dp))
+            // «SECCIÓN · 12 JUEGOS» sobre el título, como en Hiedra, Marfil y Cobalto
+            val total = l.counts.take(4).sum()
+            Text("SECCIÓN · $total ${if (total == 1) l.kind.unit else l.kind.unit + "s"}".uppercase(), color = ColGeneral, fontSize = 11.sp, fontWeight = FontWeight.Black, letterSpacing = 2.sp, maxLines = 1, modifier = Modifier.padding(top = 10.dp))
+            if (l.titleSwitch != null) Box(Modifier.padding(top = 2.dp)) { l.titleSwitch.invoke() }
+            else FitTitle(l.kind.title, 52.sp, 54.sp, letterSpacing = (-1.5).sp, modifier = Modifier.fillMaxWidth().padding(top = 2.dp))
             Box(Modifier.padding(top = 4.dp, bottom = 6.dp).fillMaxWidth().height(3.dp).background(Charcoal))
             if (l.searching) SearchPill(l.query, "Buscar en ${l.kind.title.lowercase()}", Modifier.fillMaxWidth().padding(vertical = 8.dp)) { l.setQuery(it) }
             Segmented(l.labels, l.segment, counts = l.counts) { l.onSegment(it) }

@@ -242,6 +242,8 @@ class MainActivity : ComponentActivity() {
     // Al salir de la app, los widgets se ponen al día (lo que hayas cambiado, el día de hoy)
     override fun onStop() {
         super.onStop()
+        // Con Marfil instalado, «Leyendo» y «La cita» son los suyos (aquí se apagan para no tener dos iguales)
+        runCatching { ocultarWidgetsDeMarfil(applicationContext) }
         Widgets.pedir(this)
     }
 

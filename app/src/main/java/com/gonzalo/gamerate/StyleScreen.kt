@@ -89,7 +89,9 @@ fun StyleScreen(themeMode: Int, onTheme: (Int) -> Unit, @Suppress("UNUSED_PARAME
             .wrapContentWidth().widthIn(max = 760.dp)
             .verticalScroll(rememberScrollState()).padding(horizontal = 18.dp)
     ) {
-        TopBar("Ajustes", onClose, "Apariencia")
+        TopBar("Sección", onClose, "Ajustes")
+        // Las mismas pestañas que Cuenta y Avanzado (esta es Apariencia)
+        PestanasAjustes(0) { AjustesNav.ir = it }
 
         // Tema
         SectionTitle("Tema")

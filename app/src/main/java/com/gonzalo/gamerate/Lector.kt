@@ -984,11 +984,11 @@ fun quedaPorLeer(st: JSONObject, hoy: java.time.LocalDate = java.time.LocalDate.
     return queda / 60_000L to fin
 }
 
-/** «hoy», «mañana», «el 12 de noviembre». */
+/** «hoy», «mañana», «el 12 nov». */
 fun fmtFin(d: java.time.LocalDate, hoy: java.time.LocalDate = java.time.LocalDate.now()): String = when (d) {
     hoy -> "hoy"
     hoy.plusDays(1) -> "mañana"
-    else -> "el " + d.format(java.time.format.DateTimeFormatter.ofPattern(if (d.year == hoy.year) "d 'de' MMMM" else "d 'de' MMMM 'de' yyyy", java.util.Locale("es", "ES")))
+    else -> "el " + Formato.fechaSinAno(d, hoy)
 }
 
 /**

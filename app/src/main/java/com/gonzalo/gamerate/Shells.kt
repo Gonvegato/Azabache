@@ -138,8 +138,11 @@ private fun RevistaHome(m: ShellModel) {
     val intro = remember { !RevistaIntro.done }
     LaunchedEffect(Unit) { RevistaIntro.done = true }
     fun Modifier.llega(n: Int) = appear(n * 110, intro)
-    Column(Modifier.fillMaxSize().background(Paper2).verticalScroll(rememberScrollState()).statusBarsPadding().navigationBarsPadding().padding(horizontal = 28.dp)) {
-        var buscando by remember { mutableStateOf(false) }
+    var buscando by remember { mutableStateOf(false) }
+    val desplazado = rememberScrollState()
+    val umbral = with(androidx.compose.ui.platform.LocalDensity.current) { 300.dp.toPx() }
+    Box(Modifier.fillMaxSize()) {
+    Column(Modifier.fillMaxSize().background(Paper2).verticalScroll(desplazado).statusBarsPadding().navigationBarsPadding().padding(horizontal = 28.dp)) {
         if (buscando) BuscadorGeneral(m) { buscando = false }
         Row(Modifier.fillMaxWidth().padding(top = 10.dp).llega(0), verticalAlignment = Alignment.CenterVertically) {
             EnlaceRevista("Buscar") { buscando = true }
@@ -163,10 +166,10 @@ private fun RevistaHome(m: ShellModel) {
             }
             Rule(1.dp)
         }
-        Box(Modifier.llega(1)) { RevistaLectura(all.filter { it.kind.isBook }) }
-
         // Las secciones de la revista, como el menú de una web: sin título, justo antes de la portada
-        Box(Modifier.llega(2)) { RevistaMenu(m) }
+        Box(Modifier.llega(1)) { RevistaMenu(m) }
+        // «Hoy», debajo del menú: lo leído, jugado y escrito entre las hermanas, con la semana en barras (antes solo la lectura, y la del lector de Atrio)
+        Box(Modifier.llega(2)) { RevistaHoy() }
 
         // En portada: lo que llevas entre manos ahora mismo (leyendo, jugando, viendo). Se desliza con el dedo entre
         // todas y, si no la tocas, pasa sola a la siguiente cada 7 s (después de deslizar, la cuenta vuelve a empezar)
@@ -355,7 +358,17 @@ private fun RevistaHome(m: ShellModel) {
 
         Spacer(Modifier.height(40.dp))
         Text(Ediciones.actual.pie, color = Grey2, fontFamily = Display, fontStyle = FontStyle.Italic, fontSize = 13.sp, modifier = Modifier.align(Alignment.CenterHorizontally))
+        // La versión instalada, debajo (para no tener que entrar en Ajustes a mirarla)
+        val ctxV = androidx.compose.ui.platform.LocalContext.current
+        val version = remember { runCatching { ctxV.packageManager.getPackageInfo(ctxV.packageName, 0).versionName }.getOrNull().orEmpty() }
+        if (version.isNotBlank()) Text("versión $version", color = Grey2.copy(alpha = 0.7f), fontSize = 10.sp, letterSpacing = 0.6.sp, modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 2.dp))
         Spacer(Modifier.height(24.dp))
+    }
+    // Al bajar, la cabecera se pliega: arriba solo quedan el nombre, «Buscar» y Ajustes
+    BarraPlegada("Azabache", desplazado.value > umbral, Paper2) {
+        EnlaceRevista("Buscar") { buscando = true }
+        m.profile?.let { f -> IconoRevista(androidx.compose.material.icons.Icons.Rounded.Settings, "Ajustes", f) }
+    }
     }
 }
 

@@ -9,6 +9,18 @@ Hermana de [Hiedra](https://github.com/Gonvegato/hiedra) (juegos), [Marfil](http
 y aquí aparecen solos, con su estado, sus horas y sus portadas, para valorarlos. Las películas, las series y tus categorías propias siguen
 aquí tal cual (con su «Añadir»).
 
+## 1.2.12
+
+- **Fechas y cifras como en sus hermanas** (`Formato.kt`, con las mismas pruebas en las cuatro): «16 oct 2026» en fichas y textos, «16/10/2026» en las tablas de datos y siempre con punto de millar («4.010»). Los meses van escritos en la app (Android, según la versión, les ponía punto: «oct.»).
+- **«Hoy» en la portada**, debajo del menú: lo que llevas hoy entre las tres hermanas («40 min leyendo · 2 h jugando · 500 palabras»), los días seguidos (la regla común) y la semana en barras, como en sus portadas. Sustituye a la línea de lectura, que aún miraba el lector de Atrio.
+- **Con Marfil en el móvil, los widgets «Leyendo» y «La cita» de Azabache desaparecen** (son los mismos libros y subrayados que los de Marfil: así no hay dos iguales en el selector). Si quitas Marfil, vuelven.
+- **Ajustes con las mismas pestañas que sus hermanas**: Apariencia · Cuenta · Avanzado, y la cabecera «SECCIÓN / Ajustes».
+- Las listas (Videojuegos, Libros…) y Escritos llevan «SECCIÓN · 12 JUEGOS» sobre el título, como en las hermanas.
+- Los contadores de las pestañas van en tinta (más oscura la de la pestaña elegida), no en rojo: el rojo queda para lo que se toca.
+- **Las portadas de letra, con las telas de Marfil** (la misma paleta en las cuatro y la inicial en la letra de los títulos), en vez del fondo de arena.
+- **La cabecera de la portada se pliega al bajar**: arriba solo se quedan el nombre y «Buscar» y Ajustes; el número, la fecha, las barras y el menú se van con la página.
+- Debajo de «Azabache · hecho en casa», en gris, la versión instalada.
+
 ## 1.2.11
 
 - **Arreglo del objetivo de libros (y de juegos)**: contaba solo lo que habías valorado en Azabache. Un libro leído en Marfil que aún no

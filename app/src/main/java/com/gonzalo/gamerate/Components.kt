@@ -442,3 +442,11 @@ fun rememberResumeTick(): Int {
     }
     return tick
 }
+
+/** Las telas de las portadas de letra: las mismas en Hiedra, Marfil, Cobalto y Azabache (un título, siempre el mismo color). */
+val TELAS = listOf(0xFF7A2E2E, 0xFF2F4A6B, 0xFF35523F, 0xFF5B3F6B, 0xFF8A5A2B, 0xFF3F5E63, 0xFF6B6B3A, 0xFF4A4A52).map { Color(it) }
+val PAPEL_TELA = Color(0xFFF3EDE0)
+fun telaDe(titulo: String): Color = TELAS[(java.text.Normalizer.normalize(titulo.lowercase(), java.text.Normalizer.Form.NFD).replace(Regex("\\p{M}+"), "").replace(Regex("[^\\p{L}\\p{N}]+"), " ").trim().hashCode() and 0x7fffffff) % TELAS.size]
+private fun mezclaTela(a: Color, b: Color, t: Float) = Color(a.red + (b.red - a.red) * t, a.green + (b.green - a.green) * t, a.blue + (b.blue - a.blue) * t, 1f)
+/** El fondo de una portada de letra: su tela, un poco más clara arriba y más oscura abajo (como las tapas de Marfil). */
+fun fondoTela(titulo: String): androidx.compose.ui.graphics.Brush = telaDe(titulo).let { androidx.compose.ui.graphics.Brush.verticalGradient(listOf(mezclaTela(it, Color.White, 0.10f), mezclaTela(it, Color.Black, 0.32f))) }

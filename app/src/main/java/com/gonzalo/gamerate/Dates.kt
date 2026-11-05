@@ -34,8 +34,8 @@ private const val MS_DAY = 86_400_000L
 
 fun today(): Long = LocalDate.now().toEpochDay()
 
-fun fmtDay(day: Long): String =
-    LocalDate.ofEpochDay(day).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+/** En textos y fichas: «16 oct 2026» (la forma común de las cuatro apps, [Formato]). */
+fun fmtDay(day: Long): String = Formato.fechaDia(day)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

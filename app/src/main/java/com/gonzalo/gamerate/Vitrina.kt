@@ -310,9 +310,9 @@ fun CoverCard(
         return
     }
     Box(modifier.fillMaxWidth().aspectRatio(ratio).then(if (interactive) Modifier.press(onLong = onLong, onClick = onClick) else Modifier)) {
-        Box(Modifier.matchParentSize().sharedCover(sharedKey).clip(shape).background(Sand), contentAlignment = Alignment.Center) {
+        Box(Modifier.matchParentSize().sharedCover(sharedKey).clip(shape).then(if (cover.isBlank()) Modifier.background(fondoTela(name)) else Modifier.background(Sand)), contentAlignment = Alignment.Center) {
             if (cover.isBlank()) {
-                Text(name.trim().take(1).uppercase(), fontFamily = Display, fontWeight = FontWeight.Bold, fontSize = 54.sp, color = Muted)
+                Text(name.trim().take(1).uppercase(), fontFamily = Display, fontWeight = FontWeight.SemiBold, fontSize = 54.sp, color = PAPEL_TELA.copy(alpha = 0.88f))
             } else {
                 AsyncImage(cover, name, Modifier.fillMaxSize().graphicsLayer { alpha = if (dim) 0.45f else 1f }, contentScale = ContentScale.Crop, colorFilter = Ediciones.filtro)
             }
@@ -384,10 +384,10 @@ fun HeroHeader(
             Spacer(Modifier.height(96.dp))
             Row(verticalAlignment = Alignment.Bottom) {
                 Box(
-                    Modifier.width(118.dp).aspectRatio(2f / 3f).sharedCover(sharedKey).shadow(22.dp, shp(18.dp)).clip(shp(18.dp)).background(Sand),
+                    Modifier.width(118.dp).aspectRatio(2f / 3f).sharedCover(sharedKey).shadow(22.dp, shp(18.dp)).clip(shp(18.dp)).then(if (cover.isBlank()) Modifier.background(fondoTela(title)) else Modifier.background(Sand)),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (cover.isBlank()) Text(title.take(1).uppercase(), fontFamily = Display, fontWeight = FontWeight.Bold, fontSize = 44.sp, color = Muted)
+                    if (cover.isBlank()) Text(title.take(1).uppercase(), fontFamily = Display, fontWeight = FontWeight.SemiBold, fontSize = 44.sp, color = PAPEL_TELA.copy(alpha = 0.88f))
                     else AsyncImage(cover, title, Modifier.fillMaxSize(), contentScale = ContentScale.Crop, colorFilter = Ediciones.filtro)
                 }
                 Spacer(Modifier.width(16.dp))

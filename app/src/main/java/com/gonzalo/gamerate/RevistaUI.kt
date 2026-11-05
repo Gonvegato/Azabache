@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.foundation.background
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -74,7 +75,8 @@ fun PestanasRevista(nombres: List<String>, sel: Int, modifier: Modifier = Modifi
                     .drawBehind { if (on) drawRect(ColGeneral, topLeft = Offset(0f, size.height - 3.dp.toPx()), size = Size(size.width, 3.dp.toPx())) }
                     .padding(top = 12.dp, bottom = 10.dp), verticalAlignment = Alignment.Bottom) {
                     Text(n.uppercase(), color = if (on) Charcoal else Muted, fontSize = 12.sp, fontWeight = FontWeight.Black, letterSpacing = 1.6.sp, maxLines = 1)
-                    cuentas?.getOrNull(i)?.let { c -> Text(" $c", color = ColGeneral, fontFamily = Display, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, maxLines = 1) }
+                    cuentas?.getOrNull(i)?.let { c -> Text(" $c", color = if (on) Charcoal else Muted,  // (el rojo, solo para lo que se toca: la pestaña activa y los enlaces)
+                         fontFamily = Display, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, maxLines = 1) }
                 }
             }
         }
@@ -105,7 +107,38 @@ fun FiltroRevista(texto: String, on: Boolean, modifier: Modifier = Modifier, onC
             .drawBehind { if (on) drawRect(ColGeneral, topLeft = Offset(0f, size.height - 4.dp.toPx()), size = Size(size.width, 1.5.dp.toPx())) })
 }
 
-/** Las dos pestañas de Ajustes en el móvil (una sola pantalla con dos partes, como las pestañas de Ajustes del PC). */
+/**
+ * Las pestañas de Ajustes, las mismas que en Hiedra, Marfil y Cobalto: Apariencia · Cuenta · Avanzado. [sel]: 0 Apariencia (la pantalla
+ * de estilo), 1 Cuenta (tu perfil, la pareja, los objetivos…), 2 Avanzado.
+ */
 @Composable
 fun PestanasAjustes(sel: Int, ir: (Screen) -> Unit) =
-    PestanasRevista(listOf("General", "Avanzado"), sel, Modifier.padding(bottom = 14.dp)) { if (it != sel) ir(if (it == 0) Screen.Profile else Screen.Settings) }
+    PestanasRevista(listOf("Apariencia", "Cuenta", "Avanzado"), sel, Modifier.padding(bottom = 14.dp)) {
+        if (it == sel) return@PestanasRevista
+        when (it) {
+            0 -> Skin.open = true
+            1 -> { Skin.open = false; ir(Screen.Profile) }
+            else -> { Skin.open = false; ir(Screen.Settings) }
+        }
+    }
+
+/** Ir a una pestaña de Ajustes desde la de Apariencia (que se pinta por encima, fuera de la navegación de la app). */
+object AjustesNav { var ir by androidx.compose.runtime.mutableStateOf<Screen?>(null) }
+
+
+/**
+ * La cabecera plegada de la portada: al bajar, el nombre y lo de arriba (buscar, ajustes) se quedan fijos en una barra fina, y el resto de
+ * la cabecera se va con la página. Igual en Hiedra, Marfil y Cobalto.
+ */
+@Composable
+fun BarraPlegada(nombre: String, visible: Boolean, fondo: androidx.compose.ui.graphics.Color, acciones: @Composable androidx.compose.foundation.layout.RowScope.() -> Unit) {
+    androidx.compose.animation.AnimatedVisibility(visible, enter = androidx.compose.animation.fadeIn(), exit = androidx.compose.animation.fadeOut()) {
+        androidx.compose.foundation.layout.Column(Modifier.fillMaxWidth().background(fondo).statusBarsPadding().padding(horizontal = 28.dp)) {
+            Row(Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                Text(nombre.uppercase(), color = Charcoal, fontFamily = Display, fontWeight = FontWeight.Bold, fontSize = 22.sp, letterSpacing = 1.sp, maxLines = 1, modifier = Modifier.weight(1f))
+                acciones()
+            }
+            androidx.compose.foundation.layout.Box(Modifier.fillMaxWidth().height(2.dp).background(Charcoal))
+        }
+    }
+}

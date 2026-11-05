@@ -364,3 +364,69 @@ fun RevistaLectura(books: List<ShellEntry>) {
         }
     }
 }
+
+/** Lo de un día, de las tres hermanas: leído (Marfil), jugado (Hiedra) y escrito (Cobalto). */
+class DiaHoy(val leidoMs: Long, val jugadoMs: Long, val palabras: Int) {
+    val cuenta: Boolean get() = Racha.cuentaTiempo(leidoMs) || Racha.cuentaTiempo(jugadoMs) || Racha.cuentaPalabras(palabras)
+    /** Para la altura de su barra: los minutos leídos y jugados (y unas 20 palabras el minuto). */
+    val peso: Long get() = (leidoMs + jugadoMs) / 60_000L + palabras / 20
+}
+
+/** «40 min leyendo · 2 h jugando · 500 palabras» (lo que haya; vacío si nada). Pura (se prueba). */
+fun textoHoy(d: DiaHoy): String = listOfNotNull(
+    if (d.leidoMs >= 60_000L) "${readTime((d.leidoMs + 30_000L) / 60_000L)} leyendo" else null,
+    if (d.jugadoMs >= 60_000L) "${readTime((d.jugadoMs + 30_000L) / 60_000L)} jugando" else null,
+    if (d.palabras > 0) "${Formato.cifra(d.palabras)} ${if (d.palabras == 1) "palabra" else "palabras"}" else null,
+).joinToString(" · ")
+
+/**
+ * «Hoy» en la portada, debajo del menú: lo que llevas hoy entre las tres hermanas (leyendo en Marfil, jugando en Hiedra, escribiendo en
+ * Cobalto), los días seguidos (la regla común, [Racha]) y la semana en barras, como en sus portadas. Lo que une las cuatro.
+ */
+@Composable
+fun RevistaHoy() {
+    val ctx = LocalContext.current
+    val vuelve = rememberResumeTick()
+    val dias = remember(vuelve, Hermanas.version) {
+        val l = Hermanas.leidoPorDia(ctx); val j = Hermanas.jugadoPorDia(ctx); val p = Hermanas.palabras(ctx)
+        (l.keys + j.keys + p.keys).associateWith { d -> DiaHoy(l[d]?.values?.sum() ?: 0L, j[d]?.values?.sum() ?: 0L, p[d] ?: 0) }
+    }
+    val meta = remember(vuelve, Hermanas.version) { Store(ctx).metaLectura }
+    val hoy = LocalDate.now()
+    val h = dias[hoy.toEpochDay()] ?: DiaHoy(0, 0, 0)
+    val racha = Racha.dias(hoy.toEpochDay()) { dias[it]?.cuenta == true }
+    val semana = (6 downTo 0).map { hoy.minusDays(it.toLong()) }.map { d -> d to (dias[d.toEpochDay()] ?: DiaHoy(0, 0, 0)) }
+    val algo = semana.any { it.second.cuenta }
+    if (!algo && racha < 2) return
+    val leidoMin = h.leidoMs / 60_000L
+    Column(Modifier.fillMaxWidth().padding(top = 14.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(8.dp).background(ColGeneral)); Spacer(Modifier.width(8.dp))
+            Text(
+                listOfNotNull(
+                    "HOY",
+                    textoHoy(h).ifBlank { "aún nada" }.uppercase(),
+                    if (meta > 0 && leidoMin >= meta) "OBJETIVO DE LECTURA CUMPLIDO" else null,
+                    if (racha >= 2) "$racha DÍAS SEGUIDOS" else null
+                ).joinToString(" · "),
+                fontSize = 11.sp, fontWeight = FontWeight.Black, letterSpacing = 1.4.sp, lineHeight = 15.sp, color = Charcoal
+            )
+        }
+        if (algo) {
+            val tope = maxOf(semana.maxOf { it.second.peso }, 1L).toFloat()
+            // Cada día, una barra (en el acento el de hoy); el día sin nada, una raya fina
+            Row(Modifier.fillMaxWidth().padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                semana.forEach { (d, x) ->
+                    Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Box(Modifier.fillMaxWidth(0.62f).height(30.dp), contentAlignment = Alignment.BottomCenter) {
+                            Box(Modifier.fillMaxWidth().height(if (x.cuenta) maxOf(3f, 30f * x.peso / tope).dp else 1.dp)
+                                .background(if (x.cuenta) (if (d == hoy) ColGeneral else Charcoal) else Line))
+                        }
+                        Text(d.dayOfWeek.getDisplayName(TextStyle.NARROW, Locale("es", "ES")).uppercase(), fontSize = 9.sp, fontWeight = FontWeight.Bold,
+                            color = if (d == hoy) ColGeneral else Muted, modifier = Modifier.padding(top = 4.dp))
+                    }
+                }
+            }
+        }
+    }
+}

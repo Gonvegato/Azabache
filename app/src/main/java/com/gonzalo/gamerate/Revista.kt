@@ -419,8 +419,8 @@ fun GameFacts(g: Game, kind: Kind) {
     if (g.creator.isNotBlank()) { MagFact(kind.creatorWord, g.creator); any = true }
     if (g.platform.isNotBlank()) { MagFact(kind.platformWord, g.platform); any = true }
     if (kind.isBook && g.pages > 0) { MagFact("Páginas", "${g.pages}"); any = true }
-    if (g.start > 0L) { MagFact("Empezado", fmtDay(g.start)); any = true }
-    if (g.end > 0L) { MagFact("Terminado", fmtDay(g.end)); any = true }
+    if (g.start > 0L) { MagFact("Empezado", Formato.fechaTablaDia(g.start)); any = true }
+    if (g.end > 0L) { MagFact("Terminado", Formato.fechaTablaDia(g.end)); any = true }
     // Lo que tardaste en leerlo (el tiempo que cuenta el lector de Atrio)
     if (kind.isBook) {
         val ctx = androidx.compose.ui.platform.LocalContext.current

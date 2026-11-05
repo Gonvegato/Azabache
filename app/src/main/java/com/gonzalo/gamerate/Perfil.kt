@@ -54,7 +54,7 @@ fun ProfileScreen(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).statusBarsPadding().navigationBarsPadding()
             .padding(horizontal = 18.dp).padding(bottom = 24.dp)
     ) {
-        if (Skin.revista) TopBar("Azabache", onBack, "Ajustes") else BigHeader("Perfil") { BackRound(onBack = onBack) }
+        if (Skin.revista) TopBar("Sección", onBack, "Ajustes") else BigHeader("Perfil") { BackRound(onBack = onBack) }
         pestanas()
 
         // Quién eres

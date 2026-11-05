@@ -352,7 +352,7 @@ fun SettingsScreen(
     var tk by remember { mutableStateOf(tmdbKey) }
     var confirm by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxSize().imePadding().wrapContentWidth().widthIn(max = 760.dp).statusBarsPadding().verticalScroll(rememberScrollState()).padding(16.dp)) {
-        if (Skin.revista) { TopBar("Azabache", onBack, "Ajustes"); pestanas() }
+        if (Skin.revista) { TopBar("Sección", onBack, "Ajustes"); pestanas() }
         else Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             BackButton(onBack)
             Column {

@@ -87,7 +87,8 @@ fun LecturaCobaltoScreen(onBack: () -> Unit) {
             Spacer(Modifier.height(14.dp))
             val o = obra
             if (o == null) {
-                Text("SECCIÓN", color = ColGeneral, fontSize = 12.sp, fontWeight = FontWeight.Black, letterSpacing = 1.5.sp)
+                val nObras = caps.map { it.obra }.distinct().size
+                Text("SECCIÓN · $nObras ${if (nObras == 1) "OBRA" else "OBRAS"}", color = ColGeneral, fontSize = 12.sp, fontWeight = FontWeight.Black, letterSpacing = 1.5.sp)
                 FitTitle("Escritos", 44.sp, 46.sp, fontWeight = FontWeight.Bold, modifier = Modifier.fillMaxWidth())
                 val marfil = remember { Hermanas.instalada(ctx, Hermanas.PAQ_MARFIL) }
                 val cobalto = remember { Hermanas.instalada(ctx, Hermanas.PAQ_COBALTO) }
