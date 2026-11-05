@@ -9,6 +9,13 @@ Hermana de [Hiedra](https://github.com/Gonvegato/hiedra) (juegos), [Marfil](http
 y aquí aparecen solos, con su estado, sus horas y sus portadas, para valorarlos. Las películas, las series y tus categorías propias siguen
 aquí tal cual (con su «Añadir»).
 
+## 1.2.4
+
+- **Arreglo**: en Android 11 o más, «Jugar en Hiedra», «Leer en Marfil» y «Escribir en Cobalto» no salían nunca, y el widget y el aviso de
+  lectura no abrían Marfil (Azabache no declaraba que puede ver a sus hermanas). Ahora el manifiesto las declara, y un test lo vigila.
+- Los widgets se repintan en cuanto llega algo de las hermanas (horas, subrayados, portadas), no solo al cambiar lo de Azabache.
+- Al oír que Marfil sube lo leído de un libro, solo se bajan los nodos ligeros (tiempo y subrayados), no su biblioteca entera.
+
 ## 1.2.3
 
 - En Escritos, cada obra lleva también «Escribir en Cobalto →» (abre Cobalto en esa obra, si está en el móvil).

@@ -14,6 +14,10 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <!-- Streaming: ver si Steam Link está instalado (y abrirlo) -->
     <queries>
+        <!-- Desde Android 11 una app no ve a las demás si no las declara aquí: sin esto, «Leer en Marfil», «Jugar en Hiedra» o «Escribir en Cobalto» no salen nunca en un móvil de verdad (getLaunchIntentForPackage devuelve null) -->
+        <package android:name="com.gonzalo.hiedra" />
+        <package android:name="com.gonzalo.marfil" />
+        <package android:name="com.gonzalo.cobalto" />
         <package android:name="com.valvesoftware.steamlink" />
         <!-- Leer en voz alta en el lector: desde Android 11, sin esto no se ve el motor de voz (TextToSpeech no arranca) -->
         <intent>

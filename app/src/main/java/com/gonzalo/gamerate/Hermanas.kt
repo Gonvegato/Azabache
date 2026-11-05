@@ -483,6 +483,12 @@ object Hermanas {
                 nodo("hiedra/tiempo")?.let { guarda(c, "tiempo_hiedra", it.toString()); cambio = true }
             }
         }
+        // Marfil: solo lo leído (el sello «lstamps» de un libro): los nodos ligeros, sin volver a bajar la biblioteca
+        if (!toca("marfil") && toca("marfil-lec")) runCatching {
+            nodo("marfil/tiempo")?.let { guarda(c, "tiempo_marfil", it.toString()); cambio = true }
+            val sub = nodo("marfil/subrayados")?.toString() ?: "{}"
+            if (sub != prefs(c).getString("subrayados_marfil", "")) { guarda(c, "subrayados_marfil", sub); cambio = true }
+        }
         // Marfil
         if (toca("marfil")) runCatching {
             val b = blobs(store, "marfil")
@@ -504,7 +510,8 @@ object Hermanas {
             runCatching { nodo("cobalto/lectura")?.let { guarda(c, "lectura_cobalto", it.toString()); cambio = true } }
         }
         prefs(c).edit().putLong("ultima", ahora).apply()
-        if (cambio) enPantalla { version++ }
+        // Lo que llega de las hermanas (horas, subrayados, portadas) también se ve en los widgets al momento
+        if (cambio) { enPantalla { version++ }; Widgets.pedir(c) }
         return cambio
     }
 }

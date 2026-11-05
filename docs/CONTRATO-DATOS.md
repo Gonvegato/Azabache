@@ -21,7 +21,7 @@ refleja en sus propias listas, donde se valoran. Los contratos de cada una está
 | Cobalto | `palabras/<dispositivo>` | Las palabras escritas cada día (se suman los dispositivos): el Diario. |
 | Cobalto | `lectura/<obra>/<capítulo>` | Los capítulos terminados, para «Escritos» (con Marfil en el móvil, se leen allí: Azabache abre Marfil con el extra `go=escritos`). |
 
-Se mira al abrir la app, al vincular la cuenta, al entrar en el Diario y en cuanto una hermana sube algo (se escucha `stamps` de las tres y `lstamps` de Marfil; al oír el sello de una, solo se baja lo de esa). Cada hermana escribe sus nodos ligeros **antes** de sellar.
+Se mira al abrir la app, al vincular la cuenta, al entrar en el Diario y en cuanto una hermana sube algo (se escucha `stamps` de las tres y `lstamps` de Marfil; al oír el sello de una, solo se baja lo de esa; al oír `lstamps` de Marfil, solo `tiempo` y `subrayados`). Cada hermana escribe sus nodos ligeros **antes** de sellar.
 
 ## Cómo se enlaza
 
@@ -32,6 +32,9 @@ Se mira al abrir la app, al vincular la cuenta, al entrar en el Diario y en cuan
   (solo si no la has cambiado tú). Lo que es de Azabache y nunca se toca: la nota, los criterios, la reseña, las casillas de la página.
 - Una ficha reflejada sin nota tiene todas las notas a **0**: es «sin valorar» (se ve así en su página, no cuenta en las cifras). Una ficha ya
   valorada no vuelve a «en curso» aunque la hermana diga que la rejuegas o relees: la nota manda.
+- **Verse entre hermanas**: desde Android 11 una app no ve a otra (`getLaunchIntentForPackage` da null) si no la declara en `<queries>` de su
+  manifiesto. Cada hermana declara a las demás (`com.gonzalo.hiedra`, `com.gonzalo.marfil`, `com.gonzalo.cobalto`, `com.gonzalo.gamerate`);
+  un test (`ManifiestoHermanasTest`) lo vigila. Sin esto, «Jugar en Hiedra», «Leer en Marfil» y «Escribir en Cobalto» no salen nunca en un móvil.
 
 ## Lo que escribe
 
