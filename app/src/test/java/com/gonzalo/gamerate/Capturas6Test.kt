@@ -455,7 +455,7 @@ open class Capturas6Test {
         go("Cifras"); shoot("p05_estadisticas"); home()
         icono("Ajustes"); shoot("p06_perfil")
         rule.onRoot().performTouchInput { swipeUp() }; shoot("p06b_perfil")
-        go("Servicios y copias"); shoot("p07_ajustes")
+        go("Avanzado"); shoot("p07_ajustes")
         rule.onRoot().performTouchInput { swipeUp() }; shoot("p07b_ajustes"); home()
         go("Videojuegos"); shoot("p08_biblioteca")
         go("Deadlock"); go("Apuntar\u00A0→"); shoot("p10_apunte"); back(); home()

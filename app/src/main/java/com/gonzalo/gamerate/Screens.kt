@@ -339,7 +339,7 @@ fun SettingsScreen(
     steamKey: String = "", steamUser: String = "", onSteam: (String, String) -> Unit = { _, _ -> },
     /** Tu nube (kDrive): libros, fotos y capturas en todos tus dispositivos. */
     nube: (@Composable () -> Unit)? = null,
-    /** Las pestañas de Ajustes (General · Servicios y copias), justo bajo el título. */
+    /** Las pestañas de Ajustes (General · Avanzado), justo bajo el título. */
     pestanas: @Composable () -> Unit = {},
     onBack: () -> Unit
 ) {

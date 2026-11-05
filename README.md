@@ -9,8 +9,9 @@ Hermana de [Hiedra](https://github.com/Gonvegato/hiedra) (juegos), [Marfil](http
 y aquí aparecen solos, con su estado, sus horas y sus portadas, para valorarlos. Las películas, las series y tus categorías propias siguen
 aquí tal cual (con su «Añadir»).
 
-## 1.2.1
+## 1.2.2
 
+- La segunda pestaña de Ajustes se llama «Avanzado», como en las hermanas (era «Servicios y copias»).
 - En Ajustes, la cuenta y la pareja (usuario, contraseña, entrar, sincronizar, compartir…), los interruptores y «Actualizarse sola» usan
   las casillas y los enlaces de la revista, los mismos que en Hiedra, Marfil y Cobalto, en vez de los cuadros y botones de Material.
 
@@ -76,7 +77,7 @@ aquí tal cual (con su «Añadir»).
 Generadas en el ordenador con fichas de ejemplo (`Capturas6Test`): [portada](docs/capturas/r1_portada.png) · [portada abajo](docs/capturas/r2_portada_abajo.png) ·
 [biblioteca](docs/capturas/r3_biblioteca.png) · [ficha valorada](docs/capturas/r4_ficha_valorado.png) · [ficha en curso](docs/capturas/r5_ficha_jugando.png) ·
 [libro](docs/capturas/s1_libro.png) · [Escritos](docs/capturas/p01_escritos.png) · [Diario](docs/capturas/diario_1_dias.png) · [calendario](docs/capturas/diario_2_calendario.png) ·
-[Cifras](docs/capturas/p05_estadisticas.png) · [ajustes](docs/capturas/p06_perfil.png) · [servicios y copias](docs/capturas/p07_ajustes.png) · [apariencia](docs/capturas/p11_apariencia.png) ·
+[Cifras](docs/capturas/p05_estadisticas.png) · [ajustes](docs/capturas/p06_perfil.png) · [avanzado](docs/capturas/p07_ajustes.png) · [apariencia](docs/capturas/p11_apariencia.png) ·
 [de noche](docs/capturas/r7_noche.png) · [editando una página](docs/capturas/r8_diseno.png).
 
 ## Cómo se trabaja

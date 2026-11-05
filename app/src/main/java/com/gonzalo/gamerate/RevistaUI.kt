@@ -73,4 +73,4 @@ fun FiltroRevista(texto: String, on: Boolean, modifier: Modifier = Modifier, onC
 /** Las dos pestañas de Ajustes en el móvil (una sola pantalla con dos partes, como las pestañas de Ajustes del PC). */
 @Composable
 fun PestanasAjustes(sel: Int, ir: (Screen) -> Unit) =
-    PestanasRevista(listOf("General", "Servicios y copias"), sel, Modifier.padding(bottom = 14.dp)) { if (it != sel) ir(if (it == 0) Screen.Profile else Screen.Settings) }
+    PestanasRevista(listOf("General", "Avanzado"), sel, Modifier.padding(bottom = 14.dp)) { if (it != sel) ir(if (it == 0) Screen.Profile else Screen.Settings) }

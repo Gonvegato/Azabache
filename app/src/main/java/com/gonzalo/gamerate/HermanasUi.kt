@@ -75,7 +75,7 @@ fun LecturaCobaltoScreen(onBack: () -> Unit) {
     val cap = abierto
     Column(Modifier.fillMaxSize().background(Paper).verticalScroll(rememberScrollState()).statusBarsPadding().navigationBarsPadding().padding(horizontal = 18.dp)) {
         if (cap != null) {
-            RevistaTopBar({ abierto = null }) {}
+            Row(Modifier.fillMaxWidth().padding(top = 6.dp)) { VolverRevista({ abierto = null }, "Escritos") }
             Spacer(Modifier.height(14.dp))
             Text(cap.titulo.uppercase(), color = ColGeneral, fontSize = 12.sp, fontWeight = FontWeight.Black, letterSpacing = 1.5.sp)
             FitTitle(cap.nombre.ifBlank { "Capítulo ${cap.numero}" }, 34.sp, 37.sp, fontWeight = FontWeight.Bold, modifier = Modifier.fillMaxWidth().padding(top = 6.dp))
@@ -83,7 +83,7 @@ fun LecturaCobaltoScreen(onBack: () -> Unit) {
             TextoCapitulo(cap.texto)
             Spacer(Modifier.height(40.dp))
         } else {
-            RevistaTopBar(if (obra == null) onBack else ({ obra = null })) {}
+            Row(Modifier.fillMaxWidth().padding(top = 6.dp)) { VolverRevista(if (obra == null) onBack else ({ obra = null }), if (obra == null) "Azabache" else "Escritos") }
             Spacer(Modifier.height(14.dp))
             val o = obra
             if (o == null) {

@@ -43,7 +43,7 @@ fun ProfileScreen(
     onNegraQuitar: (Vetado) -> Unit = {},
     goalGames: Int, goalBooks: Int, onGoal: (Int, Int) -> Unit,
     couple: @Composable () -> Unit,
-    /** Las pestañas de Ajustes (General · Servicios y copias), justo bajo el título. */
+    /** Las pestañas de Ajustes (General · Avanzado), justo bajo el título. */
     pestanas: @Composable () -> Unit = {},
     /** Tus categorías propias (discos, viajes…): crearlas y editarlas. */
     categorias: (@Composable () -> Unit)? = null,
@@ -239,7 +239,7 @@ fun ProfileScreen(
             confirmButton = { androidx.compose.material3.TextButton({ repasar = false }) { Text("Cancelar") } }
         )
 
-        // (las claves, importar, Drive y las copias están en la pestaña «Servicios y copias»)
+        // (las claves, importar, Drive y las copias están en la pestaña «Avanzado»)
         Spacer(Modifier.height(20.dp))
         val ver = remember { try { ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionName } catch (e: Exception) { null } ?: "" }
         Text("Azabache $ver", color = Muted, fontSize = 12.sp, modifier = Modifier.fillMaxWidth().padding(4.dp))
